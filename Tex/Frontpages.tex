@@ -6,7 +6,7 @@
 %%
   \confidential{}% show confidential tag
   \schoollogo{scale=0.112}{UCAS}% university logo
-  \title[强流束流动力学研究与软件开发]{强流束流动力学研究与软件开发}% \title[short title for headers]{Long title of thesis}
+  \title[强流束流动力学研究与模拟软件开发]{强流束流动力学研究\\与\\模拟软件开发}% \title[short title for headers]{Long title of thesis}
   \author{刘志聪}% name of author
   \advisor{秦庆~研究员}% names and titles of supervisors
   \advisorinstitute{中国科学院高能物理研究所}% institute names of supervisors
@@ -62,24 +62,24 @@
 %\begin{englishabstract}% will show the title on the top
 
 %theory
-A main problem of high current beam dynamics is space charge effect, which would lead to the resonance and instability of beam and particles. A direct result from resonance is beam halo and lose. 
+A main problem of high current beam dynamics is space charge effect, which would lead to the resonance and instability of beam and particles. A direct result from resonance is beam halo and lose.
 In order to explore the physical mechanism behind the halo formation, we used a non-self-consistent model to analyze the propagation of beam and obtained a rough physical image.
 Since the problem of space charge effect is a multi-body coupling problem, we can not get the analytic solution. In order to understand the mechanism behind the problem, we need a software to carry on the accurate numerical simulation.
 
 %PIC code
-Beam simulation code plays an indispensable role in accelerator construction. 
-As the beam current increases, the number of particles to be simulated increases by several orders of magnitude 
-and more features are required. 
+Beam simulation code plays an indispensable role in accelerator construction.
+As the beam current increases, the number of particles to be simulated increases by several orders of magnitude
+and more features are required.
 Faced with new physical problems, we need to explore new algorithms, optimize new program structure, and make a new particle simulation software.
 It also help us understanding the algorithms behind the calculation process.
-Particle-In-Cell (PIC) algorithm is widely used in accelerator research and design. 
-Based on PIC algorithm, the author developed a beam simulation software P-TOPO using C++ on the basis of predecessors. 
+Particle-In-Cell (PIC) algorithm is widely used in accelerator research and design.
+Based on PIC algorithm, the author developed a beam simulation software P-TOPO using C++ on the basis of predecessors.
 An end-to-end simulations of ADS was done, and the simulation results were in good agreement with TraceWin.
 The author also prepared code in CPU and GPU versions to achieve parallel computing and improve the efficiency of simulation software.
 
 %Symplectic code
-In addition, the author also made a GPU-based the space charge effect solver based on gridless symplectic algorithm. 
-This model uses a gridless spectral method instead of mesh point to calculate the space charge effect. 
+In addition, the author also made a GPU-based the space charge effect solver based on gridless symplectic algorithm.
+This model uses a gridless spectral method instead of mesh point to calculate the space charge effect.
 It can effectively reduce the emittance growth associated with numerical grid heating compared with the PIC algorithm.
 However, this model is much slower compared with PIC method.
 Fortunately, it is very suitable for parallelism and can achieve very good speeded and scalability, especially by using GPU and CUDA library
