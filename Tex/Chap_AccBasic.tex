@@ -75,23 +75,233 @@ $c$为光速。
 我们定义四极磁铁的聚焦强度$K$为：
 \begin{equation}
     \label{eq:quadrupole_force3}
-    K \equiv \frac{g}{B\rho} = \frac{q}{mv}                 \frac{\partial B_y}{\partial x} 
-                             = \frac{q}{\gamma m_0 \beta c} \frac{\partial B_y}{\partial x} 
+    K \equiv \frac{g}{B\rho} = \frac{q}{mv}                 \frac{\partial B_y}{\partial x}
+                             = \frac{q}{\gamma m_0 \beta c} \frac{\partial B_y}{\partial x}
 \end{equation}
 则粒子的横向运动方程可以写为：
 \begin{equation}
     \label{eq:Mathier_Hill_x}
     x'' + Kx =0
 \end{equation}
-类似的，Y方向的运动方程为：
+
+在不同的加速器元件中，$K$会发生变化，因此一个更普遍的描述单粒子横向运动的方程可以表示为：
 \begin{equation}
-    \label{eq:Mathier_Hill_y}
-    y'' - Ky =0
+    \label{eq:Mathier_Hill}
+    \begin{aligned}
+        x'' + K_x(s)x &= 0 \\
+        y'' + K_y(s)y &= 0
+    \end{aligned}
+\end{equation}
+上式也被称为希尔方程，以X方向为例，其解可以表示为\cite{abramowitz1964handbook}：
+\begin{equation}
+    \label{eq:Mathier_Hill_solver}
+    x(s)=\left\{
+    \begin{aligned}
+        &a\cos (\sqrt{K}s+b) ,& K>0 \\
+        &as+b                ,& K=0 \\
+        &a\cosh(\sqrt{-K}s+b),& K<0 \\
+    \end{aligned}
+    \right.
+\end{equation}
+当$K=0$时，表示聚焦强度为0，即粒子在漂移节中运动；当$K>0$时，表示聚焦作用；当$K<0$时，表示散焦作用。
+
+由\ref{eq:Mathier_Hill_solver}可知，$x$和$x'$都是连续的，而积分常数$a$和$b$则取决于初始条件$x(0)$和$x'(0)$。
+记$\vec{x}(s)=[x(s),x'(s)]$为粒子运动的状态矢量，则方程\ref{eq:Mathier_Hill}的解可以表示为矩阵形式：
+\begin{equation}
+    \label{eq:Mathier_Hill_solver_matrix}
+    \begin{bmatrix}
+      x   \\
+      x'  \\
+    \end{bmatrix}
+    =
+    M
+    \begin{bmatrix}
+      x_0   \\
+      x_0'  \\
+    \end{bmatrix}
+\end{equation}
+其中M叫做传输矩阵：
+\begin{equation}
+    \label{eq:Mathier_Hill_tranfermap}
+    M=
+    \begin{bmatrix}
+      R_{11} & R_{12}  \\
+      R_{21} & R_{22}  \\
+    \end{bmatrix}
+\end{equation}
+对于聚焦强度K为常数的结构，我们可以得到传输矩阵的一般形式：
+\begin{equation}
+    \label{eq:Mathier_Hill_tranfermap_K}
+    M=\left\{
+    \begin{aligned}
+        &\begin{bmatrix}
+          \cos \sqrt{K}L                & \frac{1}{\sqrt{K}} \sin \sqrt{K}L  \\
+          L{\sqrt{K}} \sin \sqrt{K}L    & \cos \sqrt{K}L   \\
+        \end{bmatrix}
+        ,& K>0:focusing  \\
+        &\begin{bmatrix}
+          1 & L  \\
+          0 & 1  \\
+        \end{bmatrix}
+        ,& K=0:drift  \\
+        &\begin{bmatrix}
+          \cosh \sqrt{|K|}L                & \frac{1}{\sqrt{|K|}} \sinh \sqrt{|K|}L  \\
+          L{\sqrt{|K|}} \sinh \sqrt{|K|}L    & \cosh \sqrt{|K|}L   \\
+        \end{bmatrix}
+        ,& K>0:focusing  \\
+    \end{aligned}
+    \right.
+\end{equation}
+其中L为初位置和末位置之间的距离。
+
+在薄透镜近似下，即$L \rightarrow 0$情况下，传输矩阵可以简化为：
+\begin{equation}
+    \label{eq:Mathier_Hill_tranfermap_thinlen}
+    M=\left\{
+    \begin{aligned}
+        &\begin{bmatrix}
+          1              & 0  \\
+         - \frac{1}{f}   & 1  \\
+        \end{bmatrix}
+        ,& K>0:focusing  \\
+        &\begin{bmatrix}
+          1 & L  \\
+          0 & 1  \\
+        \end{bmatrix}
+        ,& K=0:drift  \\
+        &\begin{bmatrix}
+          1              & 0  \\
+          \frac{1}{f}    & 1   \\
+        \end{bmatrix}
+        ,& K>0:focusing  \\
+    \end{aligned}
+    \right.
+\end{equation}
+式中$f=\lim_{L \rightarrow 0} \frac{1}{\sqrt{K}L}$为焦距。
+
+传输矩阵更一般的表达为：
+\begin{equation}
+    \label{eq:Mathier_Hill_tranfermap2}
+    M=
+    \begin{bmatrix}
+      \cos \Phi + \alpha \sin \Phi    & \beta \sin \Phi  \\
+      -\gamma \sin \Phi  & \cos \Phi - \alpha \sin \Phi  \\
+    \end{bmatrix}
+    =
+    \textbf{I} \cos \Phi + \textbf{J} \sin \Phi
+\end{equation}
+其中$\alpha$$\beta$$\gamma$就是加速器中常用的Twiss参数，
+并且$\beta \gamma = 1+{\alpha}^2$。
+$\Phi$为相移，
+$\textbf{I}$为单位矩阵，而$\textbf{J}$形式如下：
+\begin{equation}
+    \label{eq:Mathier_Hill_tranfermap3}
+    \textbf{J}=
+    \begin{bmatrix}
+      \alpha    & \beta  \\
+      -\gamma   & \alpha \\
+    \end{bmatrix}
 \end{equation}
 
-以上两式\ref{eq:Mathier_Hill_x}和\ref{eq:Mathier_Hill_y}描述了粒子的横向运动，被称为希尔方程。
 
 \section{束流纵向运动}
+加速器一般使用各种加速腔对带电粒子进行加速。
+带电粒子（参考粒子）要获取加速，必须满足各自相应的同步加速条件。
+经过一个加速单元后，同步粒子和非同步粒子的能量增益分别为：
+\begin{equation}
+    \label{eq:longitudinal1}
+    \begin{aligned}
+        \delta W_s &= e E_0 T L_c \cos {\varphi}_s \\
+        \delta W   &= e E_0 T L_c \cos {\varphi}
+    \end{aligned}
+\end{equation}
+其中$e$为带电粒子电荷，$L_c$和$E_0$分别为加速腔的长度和加速梯度，
+$T$为渡越时间因子，与加速腔的结构有关，
+而${\varphi}_s$和${\varphi}$分别为同步粒子和非同步粒子的加速相位。于是有：
+\begin{equation}
+    \label{eq:longitudinal2}
+        \frac{d\Delta W}{dz} = e E_0 T (\cos {\varphi} - \cos {\varphi}_s)
+\end{equation}
+其中
+\begin{equation}
+    \label{eq:longitudinal3}
+        \Delta W = m_0 c^2 {\gamma}_s^3 {\beta}_s \Delta \beta, \qquad \Delta \beta = \beta - {\beta}_s
+\end{equation}
+
+另外相位变化也和速度变化有关：
+\begin{equation}
+    \label{eq:longitudinal3}
+        \Delta \varphi = \varphi - {\varphi}_s = -\frac{z-z_s}{\beta _s \gamma} 2\pi
+        \quad \rightarrow \quad 
+        \Delta \beta = - \frac{\beta_s^2 \gamma}{2\pi} \frac{d \Delta \varphi}{dz}
+\end{equation}
+
+由式\ref{eq:longitudinal2}和式\ref{eq:longitudinal3}可得：
+\begin{equation}
+    \label{eq:longitudinal4}
+        \Delta \gamma = \gamma - \gamma _s
+                = \frac{\Delta W}{m_0 c^2}
+                = -\frac{\lambda}{2\pi} \beta_s^3 \gamma_s^3 \frac{d\Delta \varphi}{dz}
+\end{equation}
+
+联立上式与式\ref{eq:longitudinal2}，即可得到纵向运动方程：
+\begin{equation}
+    \label{eq:longitudinal_equation}
+        \frac{1}{\beta_s^3 \gamma_s^3} \frac{d}{dz}\left(\beta_s^3 \gamma_s^3 \frac{d\Delta \varphi}{dz}\right)
+        +\frac{2\pi e E_0 T}{m_0 c^2 \beta_s^3 \gamma_s^3 \lambda} (\cos {\varphi} - \cos {\varphi}_s)
+        =0
+\end{equation}
+展开得到:
+\begin{equation}
+    \label{eq:longitudinal_equation2}
+        \frac{d^2 \Delta \varphi}{dz^2}  
+        +\frac{3}{\beta_s \gamma_s} \frac{d\beta_s \gamma_s}{dz} \frac{d\Delta \varphi}{dz}
+        +\frac{2\pi e E_0 T}{m_0 c^2 \beta_s^3 \gamma_s^3 \lambda} (\cos {\varphi} - \cos {\varphi}_s)
+        =0
+\end{equation}
+纵向运动方程描述了粒子在（$\Delta W , \Delta \varphi$）相空间中的运动。假设加速梯度足够小，我们可以忽略阻尼项$\frac{d\beta_s \gamma_s}{dz}$，则纵向运动方程可以简化为：
+\begin{equation}
+    \label{eq:longitudinal_equation2}
+        \frac{d^2 \Delta \varphi}{dz^2}
+        +\frac{2\pi e E_0 T}{m_0 c^2 \beta_s^3 \gamma_s^3 \lambda} (\cos {\varphi} - \cos {\varphi}_s)
+        =0
+\end{equation}
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.5\textwidth]{Img/longitudinal.pdf}
+    \caption{加速腔电场、势阱、相空间轨迹和相稳定区}
+    \label{fig:longitudinal}
+\end{figure}
+
+加速腔梯度和相位的关系见图\ref{fig:longitudinal}最上方曲线。
+当同步相位处于$(-\frac{\pi}{2},0)$之间时，粒子纵向相空间存在势阱，
+相稳定区的边界为“鱼形”，如图\ref{fig:longitudinal}所示。
+势阱中的粒子围绕同步粒子$(\varphi_s,W_s)$做振荡，能够被稳定的加速。
+其稳定区的范围为：
+\begin{equation}
+    \label{eq:longitudinal_phi}
+        \varphi_2 < \varphi < -\varphi_s
+\end{equation}
+对于小角度震荡，$\varphi_2 \approx 2\varphi_s$，因此稳定区的宽度约为$3|\varphi_s|$。
+因此当$|\varphi_s|$增加时，稳定区会增大，但是由于同步相位为负，所以总能量增益会减小。
+
+前面的分析中忽略了阻尼项，但在粒子能量较低时阻尼项不可忽略。当考虑了阻尼项之后，相空间的轨迹也有所变化，但项面积依然保持恒定。
+对于低能量粒子的加速，当经过加速后，同步粒子的速度和能量有较大变化，相稳定区将有所增大，
+因而加速器的接收范围有所增加，相稳定区域的边界也由原来的“鱼形”变成“螺旋线形”形，如图\ref{fig:longitudinal1}所示。
+
+\begin{figure}[!htb]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{Img/longitudinal1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{Img/longitudinal2.pdf}
+    \end{subfigure}
+    \caption{加速腔电场、势阱、相空间轨迹和相稳定区}
+    \label{fig:longitudinal1}
+\end{figure}
+
 
 \section{空间电荷效应}
 如小节\ref{section:background}中介绍，空间电荷效应的来源为束团本身。
@@ -110,10 +320,34 @@ $c$为光速。
 其组成比较复杂，解析计算的话需要联立求解牛顿方程和麦克斯韦方程组（式\ref{eq:Newton}和\ref{eq:Maxwell}）。
 而对于这组方程，我们目前并不能给出解析解，因此其精确解必须使用数值的方法来得到。
 
-在早期计算机性能不足时，人们使用很多方法对空间电荷效应进行了近似估计。
-其中线性近似是最早发展起来的一种方法\cite{lv2004beamoptic}。
+在早期计算机性能不足时，人们使用很多方法对空间电荷效应进行了近似估计，
+例如线性近似，在这种方法中，首先假定束团的分布形态，然后使用连续电荷分布所产生的场表达粒子间的相互作用。
+例如在三维情况下，如果粒子在实空间中的分布为一个均匀的椭球，则粒子在空间中任意位置的所受到的电场可以表示为\cite{lv2004beamoptic}：
+\begin{equation}
+    \label{eq:SpaceCharge3D}
+    \begin{aligned}
+    E_x &= \frac{3ITx}{4 \pi {\varepsilon}_{0} {\gamma}^2 XYZ}{\mu}_x, \\
+    E_y &= \frac{3ITy}{4 \pi {\varepsilon}_{0} {\gamma}^2 XYZ}{\mu}_y, \\
+    E_z &= \frac{3ITz}{4 \pi {\varepsilon}_{0} {\gamma}^2 XYZ}{\mu}_z
+    \end{aligned}
+\end{equation}
+其中$I$为束流流强，$T$为相邻束团的时间间隔，
+$X$，$Y$，$Z$分别是束流在三个方向上的尺寸，$x$，$y$，$z$是粒子的位置，
+${\mu}_x$，${\mu}_y$，${\mu}_z$是束团的形状因子：
+\begin{equation}
+    \label{eq:SpaceCharge3D_mu}
+    \begin{aligned}
+    {\mu}_x &= \frac{XYZ\gamma}{2}   \int_0^{\infty}
+    \frac{d\xi}{(X^2+\xi)            \sqrt{(X^2+\xi)(Y^2+\xi)(Z^2 {\gamma}^2+\xi)}}  \\
+    {\mu}_y &= \frac{XYZ\gamma}{2}   \int_0^{\infty}
+    \frac{d\xi}{(Y^2+\xi)            \sqrt{(X^2+\xi)(Y^2+\xi)(Z^2 {\gamma}^2+\xi)}}  \\
+    {\mu}_z &= \frac{XYZ\gamma}{2}   \int_0^{\infty}
+    \frac{d\xi}{(Z^2 {\gamma}^2+\xi) \sqrt{(X^2+\xi)(Y^2+\xi)(Z^2 {\gamma}^2+\xi)}}  \\
+    \end{aligned}
+\end{equation}
 
-At HERE
+但是由于线性近似方法对束团分布的硬性假设，这种方法得到的解是非自洽的。
+而且这种方法只能得到线性空间电荷力的表达式，只能在一定情况下能够和实验结果符合，并不通用。
 
 计算机发展之后，人们使用数值方法对空间电荷效应进行研究。
 一种最直接的数值求解空间电荷效应的方法是叠加计算，即对一个粒子逐个计算与其他粒子的相互作用力，然后将其作用力叠加起来，构成该粒子的总空间电荷力。
@@ -128,15 +362,12 @@ At HERE
 由于PIC算法能够有效地降低运算量，绝大多数加速器束流模拟程序使用PIC算法来求解空间电荷力。
 关于PIC算法的详细介绍将会在第\ref{section:PIC_algorithm}节中展开。
 
-最近，无网格保辛多粒子追踪模型被引入到加速器研究和模拟中，作为在长距离模拟中空间电荷求解器 \cite{symplectic_ji2017}。
-这是因为PIC算法需要将粒子权重到网格上，不可避免的会带来网格热噪声，因此PIC算法是否可以保障辛条件（symplectic）在目前仍然有较大的争议。
+最近，无网格保辛多粒子追踪算法（Symplectic算法）被引入到加速器研究和模拟中，作为在长距离模拟中空间电荷求解器 \cite{symplectic_ji2017}。
+这是因为PIC算法需要将粒子权重到网格上，不可避免的会带来网格热噪声，PIC算法是否可以保障辛条件（symplectic）在目前仍然有较大的争议。
 如果不能报障辛条件，那么计算就会被引入一些数值算法带来的非物理的效应。
 Symplectic算法并不利用网格，而是利用高阶分解来求解空间电荷效应。
 然而，Symplectic算法虽然能够保证辛条件，但其计算量要大得多，计算花费的时间比PIC算法要高两到三个数量级。
 幸运的是，无网格算法很适合并行加速运算，有很好的可扩展性。
 我们将在后文\ref{section:symplectic_theory}节中对保辛算法的基本原理进行介绍。
 
-
 \section{国内外强流加速器简介}
-
-\section{小结}
