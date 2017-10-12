@@ -1,12 +1,16 @@
 
 \chapter{模拟程序设计及算法实现}
 \label{chap:Code}
+随着加速器的流强越来越高，束流模拟代码在束流动力学研究中的作用也越来越重要，
+尤其是在例如C-ADS，SNS，ESS等加速器中\cite{li2013physics,henderson2014spallation,eshraqi2016ess}，
+其非线性空间电荷效应占据主导地位。
+一个拥有更强大的计算能力以及更高的精确度的程序，是我们研究强流束流动力学所必须的。
 
-在本章，我们首先介绍P-TOPO程序的结构，之后分别介绍了PIC和Symplectic在GPU上的实现，其中PIC算法也在CPU集群上进行了实现。
+根据前一章中介绍的物理模型，在本章中我们对模拟程序的架构设计、代码实现、以及并行化优化策略进行介绍。
+我们首先介绍P-TOPO程序的整体结构，之后分别介绍了PIC算法在GPU上和CPU集群上的的实现，和Symplectic在GPU上的实现。
 
 \section{P-TOPO程序结构}
-随着加速器的流强越来越高，束流模拟代码在束流动力学研究中的作用也越来越重要，尤其是在例如C-ADS，SNS，ESS等加速器中\cite{li2013physics,henderson2014spallation,eshraqi2016ess}，其非线性空间电荷效应占据主导地位。一个拥有更强大的计算能力以及更高的精确度的程序，是我们研究强流束流动力学所必须的。我们开发了一个新的粒子模拟程序，命名为Parallel-Trace of Particle Orbits (P-TOPO)，致力于研究强流加速器中的空间电荷效应问题\cite{li2016nonlinear,li2014envelope,li16collective,li2015space}。
-
+我们开发了一个新的粒子模拟程序，命名为Parallel-Trace of Particle Orbits (P-TOPO)，致力于研究强流加速器中的空间电荷效应问题\cite{li2016nonlinear,li2014envelope,li16collective,li2015space}。
 P-TOPO使用C++语言开发，并且使用OpenMP进行并行化，目标是在普通多核PC机上快速模拟粒子在加速器中的行为。
 P-TOPO使用时间t，而不是使用位置z，作为基本的独立变量，这是研究粒子的空间电荷效应非常自然的选择。即时使用位置z作为基本变量，在求解空间电荷力的过程中，也需要将粒子坐标转换为同一时间t下的时空间坐标。
 在P-TOPO中，产生外场的一些加速器元件，例如各种磁铁，螺线管，RFQ，的外场使用元件的解析模型得到；而对于另外一些元件，例如超导腔，我们首先读取场文件\cite{studio2008cst}，然后采用二阶插值的方法获取粒子所受到的场的大小和方向。
@@ -482,7 +486,7 @@ P-TOPO的程序的结构如图\ref{fig:P_TOPO}所示，图中每一个条目为�
     \caption{正确性校验}\label{fig:PIC_GPU_benchmark}
 \end{figure}
 
-\section{PIC算法在CPU集群上的实现}
+\section{PIC算法在CPU集群上的实现}        \label{section:PIC_CPUcluster}
 为了和GPU做比较，我们也在CPU集群上实现了PIC程序，其使用的计算机为Cori Knight Landing，使用的是Intel最新的众核处理器，每个处理器有68个核心。
 我们的程序使用和MPI和OpenMP混合并行，以提高运行的效率。
 
@@ -571,9 +575,7 @@ P-TOPO的程序的结构如图\ref{fig:P_TOPO}所示，图中每一个条目为�
 在64*64*64个格点数，1.6m个粒子的情况下，对于同样长度的加速器，使用一个GPU代码的总耗时为3.56秒，这类似于CPU程序在300个核心上的运行时间。换而言之，对于我们的PIC程序，一个GPU卡的运算效率与4到8个CPU节点的运行效率相当。
 
 
-\section{Symplectic算法在GPU上的实现}            
-\label{section:symplectic_GPU}
-
+\section{Symplectic算法在GPU上的实现}     \label{section:symplectic_GPU}
 Symplectic算法非常适合使用GPU进行加速计算。通过使用CUDA和GPU，可以显著加快无网格粒子跟踪代码的运行速度。当运行在单个GTX 1060时，与CPU串行相比，GPU代码实现了超过400倍的加速。此外，加速比会随着GPU的数目线性增长。
 在大多数加速元件中，粒子会被推动若干步。在每一步中，粒子将首先被外场传输矩阵传输推动半个时间步长，然后由空间电荷推动一个时间步长，并再次被外场传输矩阵传输推动半个时间步长。
 其中，求解空间电荷将消耗整个计算时间的90％以上。 计算空间电荷效应的程序由下面的三个子程序组成，而每个子程序由一个或两个内核组成。
@@ -667,12 +669,9 @@ e{{p}_{i}}=\sum\limits_{j}{e{{p}_{i}}^{temp,j}}
 \end{equation}
 分成若干部分分别计算也有相应的缺点，分开计算需要更多的内存空间来保存${e{{p}_{i}}^{temp,j}}$。额外的内存使用量与粒子数和阶数成正比。在相同的的内存大小分别计算的最大粒子数会比直接计算的减少约为20％。
 
-\section{小结}                \label{section:conclusion}
+\section{小结}                            \label{section:Code_conclusion}
 本章介绍了根据PIC算法编写的粒子模拟程序P-TOPO，主要处理强流加速器中的非线性效应。
 P-TOPO的PIC部分和整体正确性都得到了验证。
-
-我们在GPU上使用使用CUDA库实现了基于PIC方法的多粒子模拟程序，并对如何避免竞争条件和实现更高性能的GPU代码结构和并行策略进行了介绍。
-
+在GPU上，我们使用CUDA库实现了基于PIC方法的多粒子模拟程序，并优化了GPU代码结构，使用特定的并行策略避免了线程竞争，是程序的性能得以提高。
 我们也新的CPU架构Cori Knight Landing上实现了PIC程序，并探索了其最佳性能的并行线程配置。通过比较，单GPU运行的程序和使用4或8个节点的程序性能相当。
-
-我们使用CUDA库在GPU上实现了无网格保辛粒子跟踪算法。这个算法能够保障辛条件并有效降低由于网格热效应带来的发射度增长。
+我们使用CUDA库在GPU上实现了Symplectic算法。由于其算法结构非常适合使用GPU进行加速计算，程序总体加速比接近500。

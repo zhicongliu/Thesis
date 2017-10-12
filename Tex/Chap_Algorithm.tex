@@ -1,9 +1,18 @@
 
 \chapter{计算机程序的物理模型及并行架构}
 \label{chap:Algorithm}
-
-\section{物理模型简介}
 加速器是加速带电粒子束流的机器。我们面临的主要问题也是在束流中，其中空间电荷效应是其中非常重要的一种。
+特别是对于强流加速器，空间电荷效应更加明显，在程序中必须正确处理。
+如我们在\label{section:spaceChargeIntro}节中所介绍，目前存在若干种不同的计算空间电荷效应的模型，
+比如线性近似，P2P方法，PIC模型，Symplectic模型。不同模型的计算速度、精度、近似程度都有所区别。
+
+在本章中，主要介绍计算空间电荷效应的几种物理模型以及并行计算处理器。
+首先，小节\ref{section:particle_core}对一种近似求解空间电荷效益的物理模型，束核模型进行介绍。
+其次，在\ref{section:PIC_algorithm}节中对束流模拟的一般方法进行介绍，主要有PIC方法中的权重粒子，求解泊松方程，以及推动粒子等。
+之后，在\ref{section:symplectic_theory}节中对一种新型的求解空间电荷效应的模型（Symplectic模型）进行介绍。
+最后，我们在\ref{section:GPU_CPU}节中对不同的计算机并行结构进行一些比较。
+
+\section{物理模型简介}            \label{section:particle_core}
 针对空间电荷问题，我们主要有两种描述手段，分别是使用解析的方法和数值的方法，其中解析的方法为求解傅拉梭夫方程（Vlasov Equation），如式\ref{eq:Vlasov}。
 \begin{equation}
     \label{eq:Vlasov}
@@ -113,8 +122,7 @@ K=\frac{qI}{2\pi \varepsilon m{{c}^{3}}{{\beta }^{3}}{{\gamma }^{3}}}
 
 束核模型在一定程度上可以解释束晕形成的机制，但是这个模型并不是自洽的，与实际不相符。束核模型假设束核是稳定的，并且外部聚焦力是恒定的常数；而实际的束核有可能是不稳定的，外部的聚焦力也是可能变化的。因此，我们需要一个更加自洽的系统来研究束流的行为。
 
-\section{束流模拟原理及PIC方法}
-\label{section:PIC_algorithm}
+\section{束流模拟原理及PIC方法}   \label{section:PIC_algorithm}
 数值模拟在束流动力学研究和加速器设计中非常重要，质点网格法（PIC方法）是一种使用自洽的系统对粒子进行模拟的算法。目前，主流的模拟软件都是使用的PIC求解空间电荷效应\cite{PIC_Birdsall1991, PIC_friedman1992, PIC_ji2000, PIC_ji2004, PIC_Amundson2006229, PIC_tracewin2014, PIC_beampath2005}。
 使用PIC算法进行束流模拟的基本流程如图\ref{fig:PICflow1}和\ref{fig:PICflow2}所示。
 
@@ -297,27 +305,27 @@ K_n = (\frac{2\pi n}{N_x \Delta _x}) \frac{\sin({\pi n}/{N_x})}{{\pi n}/{N_x}} \
 在本程序中，我们在横向采用第一类边界条件，用来模拟边界处的电势为0；而在纵向采用周期性边界条件，用以模拟连续束流。
 
 \subsection{使用蛙跳法推动粒子}
+在束流模拟中，一般使用蛙跳法来推动粒子。蛙跳法满足一致性、同时性、高准确性、高稳定性四个条件：
 
-我们使用经典的牛顿方程来推动粒子：
-\begin{align}
-\label{eq:PIC_push1}
- \frac{\mathrm{d} \mathbf{x}}{\mathrm{d} t} &= \mathbf{v}  \\
-\label{eq:PIC_push2}
-m\frac{\mathrm{d} \mathbf{v}}{\mathrm{d} t} &= \mathbf{F}
-\end{align}
-粒子推动的方法必须满足以下五个条件：
 \subsubsection{一致性}
       一致性是指差分方程和微分方程的一致。任何数值算法都是使用有限大小的步长来模拟一个连续的过程。
       因此，我们我们应该在时间步长无线小的时候，使其效果与连续推动一致。
-
-      例如，我们采用有限步长$\Delta T$ 来推动粒子位置：
+      
+      考虑经典的牛顿方程：
+      \begin{align}
+        \label{eq:PIC_push1}
+         \frac{\mathrm{d} \mathbf{x}}{\mathrm{d} t} &= \mathbf{v}  \\
+        \label{eq:PIC_push2}
+        m\frac{\mathrm{d} \mathbf{v}}{\mathrm{d} t} &= \mathbf{F}
+      \end{align}
+      如果我们采用有限步长$\Delta T$ 来推动粒子位置：
       \begin{align}
          \label{eq:PIC_push3}
          \frac{\mathbf{x}_{n+1}-\mathbf{x}_n}{\Delta T} &= \mathbf{v}_n  \\
          \label{eq:PIC_push4}
           m\frac{\mathbf{v}_{n+1}-\mathbf{v}_n}{\Delta T} &= \mathbf{F}_n
       \end{align}
-                当其步长$\Delta T$足够小时，其结果应该与微分方程\ref{eq:PIC_push1} 和\ref{eq:PIC_push2}相一致。
+      当其步长$\Delta T$足够小时，其结果应该与微分方程\ref{eq:PIC_push1} 和\ref{eq:PIC_push2}相一致。
 \subsubsection{同时性}
       同时性又叫做可逆性。微分方程\ref{eq:PIC_push1}和\ref{eq:PIC_push2}是可逆的。例如，一个粒子在给定的力场中沿时间正向积分运动，然后如果将其速度取反，并沿时间反向积分，粒子将会沿着正向的轨迹向回运动，并能回到起始点。
 
@@ -437,9 +445,7 @@ m\frac{\mathrm{d} \mathbf{v}}{\mathrm{d} t} &= \mathbf{F}
 %blabla...
 
 
-\section{Symplectic算法}
-\label{section:symplectic_theory}
-
+\section{Symplectic模型}          \label{section:symplectic_theory}
 PIC算法是求解空间电荷效应非常快速有效的方法，在PIC算法中，粒子首先被根据位置权重到网格上，然后根据网格上的电荷密度求解泊松方程，得到网格上的电势，从而得到网格上的电场，再根据粒子位置反推出粒子所处位置的电场。使用这种方法，计算复杂度由直接的粒子-粒子方法的 $N_p^2$ 降低到了$\alpha N_p + \beta N_{cells}\log{N_{cells}}$。其中 $N_p$ 是粒子数，而$N_{cells}$ 是网格点数目。
 
 然而，由于PIC算法不可避免的会带来网格热噪声，因此目前加速器界常用的PIC算法并不能保障辛条件（symplectic）。其计算就会被引入非物理效应，并对最终的强流束流物理的分析和讨论会带来一些干扰。因此，在需要长程模拟（比如环形加速器）的物理分析中，我们需要一种保辛的算法。
@@ -561,7 +567,7 @@ ${{L}_{ij}}=\frac{\partial {{p}_{i}}(\tau )}{\partial {{r}_{j}}}=-\frac{{{\parti
 在Y和Z方向的传输矩阵与之类似。
 
 
-\section{GPU和CPU架构}
+\section{GPU和CPU架构}            \label{section:GPU_CPU}
 GPU英文全称Graphic Processing Unit，中文为“图形处理器”。
 GPU一开始是由于在现代的计算机中图形的处理变得越来越重要，需要一个专门的图形的核心处理器，使显卡减少对CPU的依赖，并进行部分原本CPU的工作；CPU是英文全称为Central Processing Unit，中文为“中央处理器”，一般由逻辑运算单元、控制单元和存储单元组成。
 近年来，GPU高速发展，极大的提高了计算机图形处理的速度和质量，不但促进了图像处理、虚拟现实、计算机仿真等相关应用领域的快速发展，同时也为人们利用GPU进行图形处理以外的通用计算提供了良好的运行平台。
@@ -578,6 +584,26 @@ GPU 加速计算是指同时利用GPU 和 CPU，加快应用程序的运行速�
 \end{figure}
 
 随着GPU可编程能力、并行处理能力和应用范围方面得到不断提升和扩展，GPU已成为当前计算机系统中性能很高的部件。
-因此，我们需要充分利用现有计算资源，发挥GPU的高性能计算能力，使程序在GPU与CPU之间进行协作，以提高模拟程序的运行效率。
+因此，我们对PIC算法和Symplectic算法都进行了GPU实现，充分利用了现有计算资源，发挥GPU的高性能计算能力，使程序在GPU与CPU之间进行协作，以提高模拟程序的运行效率。
+
+\section{小结}                    \label{section:Algorithm_conclusion}
+在本章中，介绍计算了几种求解空间电荷效应的模型及计算机并行的并行。
+早期的束核模型存在稳定束核假设和对空间电荷力进行了线性近似，是一个非自洽模型。
+只能在一定程度上定性解释束晕形成的机制，而无法定量的求解出实际加速器中的空间电荷效应的影响。
+
+在束流模拟中，我们一般采用PIC算法来求解空间电荷力，使用蛙跳法推动粒子，其满足一致性、同时性、高准确性、高稳定性四个条件。
+PIC算法是一个更加自洽的用来研究考虑空间电荷效应的束流行为的方法。
+在PIC算法中，粒子首先被根据位置权重到网格上，
+然后在网格上的求解泊松方程，以得到网格上的电势，
+再根据粒子位置反推出粒子所处位置的电场。
+PIC有效地降低了计算量，成为了国际上主流的空间电荷效应算法。
+
+然而，由于PIC算法含有网格热噪声，会被引入一些非物理效应，我们引出了Symplectic模型。
+这种模型利用对粒子的高阶分解来求解空间电荷效应。
+相比PIC算法，Symplectic模型计算量要大得多，但是能够显著的降低PIC算法中由于网格热噪声带来的发射度增长。
+
+由于Symplectic算法计算量巨大，PIC算法也有提高效率的需求，我们研究对比了不同的计算机并行处理器。
+相比于CPU，GPU在逻辑判断上运算能力相对较弱，但是在并行计算密集型问题方面具有很大优势。
+因此，我们在GPU上对PIC算法和Symplectic算法进行了实现，并且在CPU集群上对PIC算法进行了实现。
 
 

@@ -1,8 +1,14 @@
-\chapter{程序模拟结果及对实际机器的模拟研究}
-\label{chap:Simulation}
+\chapter{程序模拟结果及对实际机器的模拟研究} \label{chap:Simulation}
+随着加速器束流流强的增大，为了对束流进行精确的模拟和研究，我们需要模拟的粒子数目增加了几个量级。
+在这种趋势下，束流模拟软件的效率至关重要。
+第\ref{chap:Code}章介绍了束流模拟程序在GPU和CPU上的并行实现，
+在本章中，小节\ref{section:PIC_performance}和\ref{section:Symplectic_performance}将分别对PIC算法和Symplectic算法的GPU并行性能进行了测试。
 
-这种特性非常适合使用GPU进行加速计算。通过使用CUDA和GPU，可以显著加快无网格粒子跟踪代码的运行速度。当运行在单个GTX 1060时，与CPU串行相比，GPU代码实现了超过400倍的加速。此外，加速比会随着GPU的数目线性增长。
-\section{PIC算法性能}
+之后，我们使用束流模拟软件研究了几个空间电荷相关的问题。
+首先，第\ref{section:3rd_order_simulation}节介绍了对空间电荷导致的三阶共振进行的模拟研究，
+之后，在第\ref{section:ADS_simulation}节我们使用P-TOPO程序对C-ADS的注入器I进行了模拟研究。
+
+\section{PIC算法性能}             \label{section:PIC_performance}
 
 \subsection{单GPU}
 首先，我们通过对比CPU程序和GPU程序的运行速度，来得到GPU程序的的加速比，加速比等于CPU程序耗时除以GPU程序耗时。测试使用的格点数为64*64*64，图\ref{fig:PIC_speedup_1GPU}和表\ref{tab:PIC_speedup_1GPU}是粒子数从16k到1.6m时CPU程序和GPU程序各部分耗时以及加速比。程序消耗的总时间的加速比大约有40，然而每一部分的加速比有很大不同。
@@ -146,7 +152,7 @@
   \label{fig:PIC_speedup_Titan_16m}
 \end{figure}
 
-\section{Symplectic算法性能}               \label{section:performance}
+\section{Symplectic算法性能}      \label{section:Symplectic_performance}
 我们使用GPU程序的性能和可拓展性进行了两个测试，第一个测试使用一个普通的家用GPU：GTX 1060 6GB，测试的结果与在CPU串行运行的程序进行比较。第二个测试使用美国能源部下属的橡树岭国家实验室（ORNL）的GPU集群泰坦，用于测试程序的可扩展性，即程序在多GPU下的表现。
 
 \subsection{单GPU性能提升-GTX1060}
@@ -214,7 +220,7 @@
 
 图\ref{fig:TotalTitan}是程序整体总时间的加速比，其中外部传输矩阵，坐标变换，粒子信息统计这些部分也是并行化的。但是因为它们的计算量较低，很难取得很高的并行度。所以加速比略微下降。
 
-\section{三阶共振模拟}                \label{section:simulation}
+\section{三阶共振模拟}            \label{section:3rd_order_simulation}
 我们使用这套保辛算法在周期聚焦结构中进行粒子跟踪和模拟。我们使零流强的周期相移为86.3259度，如果将10个周期视为一个环，则环的工作点为2.3979。随着流强的增加，相移会被压缩，工作点会在0.6A左右穿过2.3333的三阶共振线。环中还存在一个六极磁铁。
 
 图\ref{fig:emitGrowthCompare}为不同流强下的束流发射度增长变化，可以看到，发射度在流强为0.1A 和0.2A 时基本保持不变，这时的工作点约为2.40。但是发射度在流强为0.4A，0.6A，和0.8A时持续增长，这时的工作点在2.3333附近，可知其发射度增长是由于三阶共振导致。
@@ -248,9 +254,8 @@
     \end{subfigure}
     \caption{三阶共振附近的庞加莱截面}\label{fig:Poincare}
 \end{figure}
-\section{C-ADS注入器I模拟}
-
-我们使用P-TOPO代码模拟了C-ADS的注入器I。加速器驱动次临界洁净核能系统（Accelerator Driven Sub-critical System，ADS），是一种新型的能源装置，其基本原理是利用经过加速器加速的高能质子，撞击重靶核发生反应，一个质子引起的散裂反应可产生几十个中子，再使用散裂产生的中子作为中子源来驱动次临界包层系统，使次临界包层系统维持链式反应以便得到能量和利用多余的中子增殖核材料和嬗变核废物，其中中国ADS（C-ADS）的加速器部分由中国科学院高能物理研究所和近代物理研究所共同研究。C-ADS的注入器I由离子源（electron cyclotron resonance ion-source，ECRIS），低能传输线，RFQ，中能传输线，两个超导加速模块，以及最后的垃圾桶组成，其结构如图\ref{fig:ADS_layout}所示
+\section{C-ADS注入器I模拟}        \label{section:ADS_simulation}
+我们使用P-TOPO程序模拟了C-ADS的注入器I。C-ADS的注入器I由离子源（electron cyclotron resonance ion-source，ECRIS），低能传输线，RFQ，中能传输线，两个超导加速模块，以及最后的垃圾桶组成，其结构如图\ref{fig:ADS_layout}所示
 
 \begin{figure}[!htb]
     \centering
@@ -375,14 +380,16 @@ C-ADS注入器I的基本参数如表\ref{tab:C_ADS_parameters}所示。其中RFQ
 
 在RFQ和超导段两段模拟中，传输效率都在99.9\%以上，束团尺寸和束损都得到了有效控制，横向和纵向的发射度都保持良好。不同代码的模拟结果差别主要是因为初始的束团分布不同，以及统计数据的方式不同，特别是P-TOPO是以时间t为基本变量，而TRACK是以位置z为基本变量，因此粒子信息收集，空间电荷力的计算，以及粒子推动方式都有所不同。
 
-\section{小结}                \label{section:conclusion}
-对于PIC算法，在单个GPU卡上，我们使用普通的家用GPU（GTX 1060）实现了超过50倍的加速。当粒子数较大时，程序在GPU集群上也显示出良好的可扩展性；而当粒子数目较小时其可扩展性较差。
+\section{小结}                    \label{section:Simulation_conclusion}
+通过对并行程序的性能测试可以看出，对于PIC算法在单个普通家用GPU（GTX 1060）上相对于单核CPU实现了超过50倍的加速。
+当模拟使用的粒子数较大时，PIC算法在GPU集群上也显示出良好的可扩展性；而当粒子数目较小时其可扩展性较差。
 
-对于Symplectic算法，在一个普通家用GPU上，程序获得了超过450倍的加速比。同时，我们在GPU集群泰坦上的测试还显示出这种算法有良好的可扩展性，程序的加速比随着GPU数目几乎线性增加。
+对于Symplectic算法，在一个普通家用GPU上相对于单核CPU实现了接近500倍的加速比。
+同时，我们在GPU集群泰坦上的测试还显示出这种算法有良好的可扩展性，程序的加速比随着GPU数目几乎线性增加。
 
 我们在周期性聚焦结构中使用Symplectic算法进行了几个应用模拟，当工作点远离共振线时，束流不会出现发射度增长，而当其接近共振线时发射度会持续增长。
-在未来的研究中，我们将继续扩展此程序，在不同架构的计算机上比较保辛算法的效率。
+在未来的研究中，我们将继续扩展此模型速发，并在不同架构的计算机上比较保辛算法的效率。
 
-最后，程序对C-ADS注入器I的RFQ和超导段分别进行了模拟并且与其他程序进行了比较。
+最后，我们使用P-TOPO程序对C-ADS注入器I的RFQ和超导段分别进行了模拟并且与其他程序进行了比较。
 模拟结果证明了现有设计的合理性，束团的尺寸和发射度都得到了有效控制，束损以及能散也在合理范围之内，完全满足需求。
 之后，我们将继续对P-TOPO进行拓展并加入更多新的功能，以满足强流加速器的各种需求。
