@@ -45,14 +45,27 @@
 %\begin{abstract}% will show the title on the top
 
 %theory
-强流束流动力学主要问题是空间电荷效应问题。空间电荷效应会导致束流和粒子的共振和不稳定性，束流的共振和不稳定的一个显著结果就是束晕，从而产生束损。为了探寻束晕产生背后的物理机制，我们使用了非自洽的模型对束晕产生的机制进行了分析，得到了一个粗略的物理图像。由于空间电荷效应问题是一个多体耦合问题，我们无法得到解析解，为了更加深入的了解问题背后的机制，我们需要一个软件进行精确的数值模拟。
+强流束流动力学主要问题是空间电荷效应问题。空间电荷效应会导致束流和粒子的共振并引起不稳定性，其显著结果就是束晕和束损。
+为了探寻束晕产生背后的物理机制，本文首先介绍了一种非自洽的空间电荷模型，并使用其对束晕产生的机制进行了分析，得到了一个粗略的物理图像。
+然而由于空间电荷效应问题是一个多体耦合问题，无法得到解析解，为了更加深入地了解问题背后的机制，一个可以进行精确数值模拟的程序是必须的。
 
 %PIC code
-束流模拟软件在加速器建设中起到了必不可少的作用。随着束流流强的增大，需要模拟的粒子数目增加了几个量级，需要的功能也越来越多。面对新的物理问题，我们需要探索新的算法，优化新的程序结构，编写出一个新的粒子模拟软件，了解并掌握软件背后的计算过程。
-粒子云网格（Particle-In-Cell）算法被广泛应用于加速器的研究和设计中。基于此，作者在前人的基础上使用C++开发了束流模拟软件P-TOPO。并且对ADS进行了end-to-end模拟，模拟结果和TraceWin进行对照相符很好。作者还编写CPU和GPU两个版本，实现并行计算，来提高模拟软件的效率。
+束流模拟软件在加速器研究和设计中起到了非常重要的作用。
+随着束流流强的增大，需要模拟的粒子数目增加了几个量级，需要的功能也越来越多。
+面对新的物理问题，我们需要探索新的算法，优化新的程序结构，编写出一个新的粒子模拟软件，了解并掌握软件背后的计算过程。
+基于此，作者在前人的基础上，基于PIC算法，使用C++语言开发了束流模拟程序P-TOPO。
 
-%Symplectic code
-除此之外，作者还编写了基于GPU的求解空间电荷效应的无网格保辛算法。这种算法模型并不利用网格，而是利用高阶分解来求解空间电荷效应。相比PIC算法，这种方法能够显著的降低由于网格数值噪声带来的发射度增长，但是计算量要大得多。然而由于无网格算法很适合并行，有很好的可扩展性，这种算法非常适合使用GPU进行加速计算。通过使用CUDA和GPU，可以显著加快无网格粒子跟踪代码的运行速度。
+对于程序中的关键算法，我们进行了并行化研究，以提高模拟软件的效率。
+程序对PIC算法在GPU上和CPU集群上都进行了并行化实现。
+除此之外，作者还引入了一种求解空间电荷效应的无网格Symplectic算法，并在GPU上做了并行实现。
+这种算法模型并不利用网格，而是利用高阶分解来求解空间电荷效应。
+相比PIC算法，这种方法能够显著的降低由于网格热噪声带来的发射度增长，但是其计算量要大得多。
+然而由于无网格算法很适合并行，有很好的可扩展性，这种算法非常适合使用GPU进行加速计算。
+通过使用CUDA和GPU，基于Symplectic算法的程序运行速度得到显著增加。
+
+最后，作者使用Symplectic算法对周期聚焦结构中的三阶共振现象进行了模拟和研究。
+并且使用P-TOPO对C-ADS注入器I进行了end-to-end模拟，模拟结果和其他模拟软件的结果进行了对照，
+一方面验证了P-TOPO的正确性，另一方面验证了C-ADS注入器I设计的合理性。
 
 \keywords{空间电荷效应，PIC，Symplectic，GPU，模拟软件}
 %\end{abstract}
@@ -62,27 +75,35 @@
 %\begin{englishabstract}% will show the title on the top
 
 %theory
-A main problem of high current beam dynamics is space charge effect, which would lead to the resonance and instability of beam and particles. A direct result from resonance is beam halo and lose.
+A main problem of high current beam dynamics is the space charge effect, which would lead to the resonance and instability of beam and particles. 
+A direct result from resonance is beam halo and lose.
 In order to explore the physical mechanism behind the halo formation, we used a non-self-consistent model to analyze the propagation of beam and obtained a rough physical image.
-Since the problem of space charge effect is a multi-body coupling problem, we can not get the analytic solution. In order to understand the mechanism behind the problem, we need a software to carry on the accurate numerical simulation.
+Since the problem of space charge effect is a multi-body coupling problem, we can not get the analytic solution. 
+In order to understand the mechanism behind the problem, we need a software to carry on the accurate numerical simulation.
 
 %PIC code
-Beam simulation code plays an indispensable role in accelerator construction.
+Beam simulation code plays an indispensable role in accelerator design.
 As the beam current increases, the number of particles to be simulated increases by several orders of magnitude
 and more features are required.
 Faced with new physical problems, we need to explore new algorithms, optimize new program structure, and make a new particle simulation software.
-It also help us understanding the algorithms behind the calculation process.
+It also helps us understanding the algorithms behind the calculation process.
 Particle-In-Cell (PIC) algorithm is widely used in accelerator research and design.
 Based on PIC algorithm, the author developed a beam simulation software P-TOPO using C++ on the basis of predecessors.
-An end-to-end simulations of ADS was done, and the simulation results were in good agreement with TraceWin.
-The author also prepared code in CPU and GPU versions to achieve parallel computing and improve the efficiency of simulation software.
+
+For the key algorithms in the program, we studied the parallel strategies 
+and made implements of the paralleled PIC algorithm on the GPU and the CPU cluster 
+to improve the efficiency of the simulation software.
+In addition, the author also made a GPU-based the space charge solver based on gridless symplectic algorithm.
+This model uses a gridless spectral method instead of mesh points to calculate the space charge effect.
+It can effectively reduce the emittance growth associated with numerical grid heating compared with the PIC algorithm at the expense of speed.
+Fortunately, it is very suitable for parallelism and can achieve very good speeded and scalability, especially by using GPU and CUDA library.
+
+Finally, the symplectic algorithm is used to simulate and study the third-order resonance in the periodic focusing structure.
+An end-to-end simulation of C-ADS injector I is performed using P-TOPO.
+The simulation results and these from other simulation codes were compared, on the one hand to verify the correctness of the P-TOPO, on the other hand to verify that the C-ADS injector I design is reasonable.
 
 %Symplectic code
-In addition, the author also made a GPU-based the space charge effect solver based on gridless symplectic algorithm.
-This model uses a gridless spectral method instead of mesh point to calculate the space charge effect.
-It can effectively reduce the emittance growth associated with numerical grid heating compared with the PIC algorithm.
-However, this model is much slower compared with PIC method.
-Fortunately, it is very suitable for parallelism and can achieve very good speeded and scalability, especially by using GPU and CUDA library
 
-\englishkeywords{Space Charge Effect, PIC, Symplectic, GPU, Simulation Code}
+
+\englishkeywords{Space Charge, PIC, Symplectic, GPU, Simulation Code}
 %\end{englishabstract}
