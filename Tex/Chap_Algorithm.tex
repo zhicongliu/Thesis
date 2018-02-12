@@ -3,7 +3,7 @@
 \label{chap:Algorithm}
 加速器是加速带电粒子束流的机器。我们面临的主要问题也是在束流中，其中空间电荷效应是其中非常重要的一种。
 特别是对于强流加速器，空间电荷效应更加明显，在程序中必须正确处理。
-如我们在\label{section:spaceChargeIntro}节中所介绍，目前存在若干种不同的计算空间电荷效应的模型，
+如我们在\ref{section:spaceChargeIntro}节中所介绍，目前存在若干种不同的计算空间电荷效应的模型，
 比如线性近似，P2P方法，PIC模型，Symplectic模型。不同模型的计算速度、精度、近似程度都有所区别。
 
 在本章中，主要介绍计算空间电荷效应的几种物理模型以及并行计算处理器。
@@ -90,7 +90,7 @@ K=\frac{qI}{2\pi \varepsilon m{{c}^{3}}{{\beta }^{3}}{{\gamma }^{3}}}
     \label{fig:particle_core_particle}
 \end{figure}
 
-对粒子从中心到边界均匀排布，我们可以得到一组庞加莱截面，以显示不同初始位置处粒子的行为，如图\ref{fig:particle_core_Poincare}所示。四副图分别为不同的相位压缩因子$\eta$下的庞加莱截面，不同的颜色代表不同初始位置的粒子的轨迹。
+对粒子从中心到边界均匀排布，我们可以得到一组庞加莱截面，以显示不同初始位置处粒子的行为，如图\ref{fig:particle_core_Poincare}所示。三副图分别为不同的相位压缩因子$\eta$下的庞加莱截面，不同的颜色代表不同初始位置的粒子的轨迹。
 \begin{figure}[!htbp]
   \centering
   ~%add desired spacing
@@ -283,7 +283,7 @@ TSC方法为二阶差值，如图\ref{fig:PIC_TSC}所示，分配函数为三角
  = \frac{\Delta _{x}^{2}}{\epsilon _0} {\rho_n} \\
 \end{equation}
 化简得到
-\begin{equation}\label{eq:FFT@PIC3}
+\begin{equation}\label{eq:FFT@PIC3_consice}
 \phi_{n} = \frac{\rho_n}{\epsilon _0 K_n^2} \\
 \end{equation}
 其中
@@ -310,7 +310,7 @@ K_n = (\frac{2\pi n}{N_x \Delta _x}) \frac{\sin({\pi n}/{N_x})}{{\pi n}/{N_x}} \
 \subsubsection{一致性}
       一致性是指差分方程和微分方程的一致。任何数值算法都是使用有限大小的步长来模拟一个连续的过程。
       因此，我们我们应该在时间步长无线小的时候，使其效果与连续推动一致。
-      
+
       考虑经典的牛顿方程：
       \begin{align}
         \label{eq:PIC_push1}
@@ -578,7 +578,7 @@ GPU 加速计算是指同时利用GPU 和 CPU，加快应用程序的运行速�
 根据使用CUDA的测试结果显示，利用GPU实现FFT（Fast Fourier Transformation）、BLAS（Basic Linear Algebra Subprograms）、排序及线性方程组求解等科学计算，与单纯依靠CPU实现的算法相比，平均性能提高了近20倍。
 \begin{figure}[!htb]
     \centering
-    \includegraphics[width=0.9\textwidth]{plot/GPU_vs_CPU.png}
+    \includegraphics[width=0.9\textwidth]{Img/GPU_vs_CPU.png}
     \caption{GPU与CPU的结构对比}
     \label{fig:GPU}
 \end{figure}

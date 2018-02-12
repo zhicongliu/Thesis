@@ -75,10 +75,10 @@
 %\begin{englishabstract}% will show the title on the top
 
 %theory
-A main problem of high current beam dynamics is the space charge effect, which would lead to the resonance and instability of beam and particles. 
+A main problem of high current beam dynamics is the space charge effect, which would lead to the resonance and instability of beam and particles.
 A direct result from resonance is beam halo and lose.
 In order to explore the physical mechanism behind the halo formation, we used a non-self-consistent model to analyze the propagation of beam and obtained a rough physical image.
-Since the problem of space charge effect is a multi-body coupling problem, we can not get the analytic solution. 
+Since the problem of space charge effect is a multi-body coupling problem, we can not get the analytic solution.
 In order to understand the mechanism behind the problem, we need a software to carry on the accurate numerical simulation.
 
 %PIC code
@@ -90,8 +90,8 @@ It also helps us understanding the algorithms behind the calculation process.
 Particle-In-Cell (PIC) algorithm is widely used in accelerator research and design.
 Based on PIC algorithm, the author developed a beam simulation software P-TOPO using C++ on the basis of predecessors.
 
-For the key algorithms in the program, we studied the parallel strategies 
-and made implements of the paralleled PIC algorithm on the GPU and the CPU cluster 
+For the key algorithms in the program, we studied the parallel strategies
+and made implements of the paralleled PIC algorithm on the GPU and the CPU cluster
 to improve the efficiency of the simulation software.
 In addition, the author also made a GPU-based the space charge solver based on gridless symplectic algorithm.
 This model uses a gridless spectral method instead of mesh points to calculate the space charge effect.
