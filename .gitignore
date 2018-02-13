@@ -1,5 +1,6 @@
 #the other things
 word/
+[BackUp]*
 
 ## Core latex/pdflatex auxiliary files:
 *.aux

@@ -11,7 +11,7 @@
 \section{PIC算法性能}             \label{section:PIC_performance}
 
 \subsection{单GPU性能提升-GTX1060}
-首先，我们通过对比CPU程序和GPU程序的运行速度，来得到GPU程序的的加速比。加速比等于CPU程序耗时除以GPU程序耗时。测试使用的格点数为 64*64*64，图\ref{fig:PIC_speedup_1GPU}和表\ref{tab:PIC_speedup_1GPU}是粒子数从16k到1.6m时CPU程序和GPU程序各部分耗时以及加速比。程序消耗的总时间的加速比大约有40，然而每一部分的加速比有很大不同。
+首先，我们通过对比CPU程序和GPU程序的运行速度，来得到GPU程序的的加速比。加速比等于CPU程序耗时除以GPU程序耗时。测试使用的格点数为~ 64*64*64，图\ref{fig:PIC_speedup_1GPU}和表\ref{tab:PIC_speedup_1GPU}是粒子数从16k到1.6m时CPU程序和GPU程序各部分耗时以及加速比。程序消耗的总时间的加速比大约有40，然而每一部分的加速比有很大不同。
 
 其中，橙色柱行代表求解泊松方程，其加速比大约是64，而且并不随粒子数目的变化而变化。事实上，求解泊松方程的计算量主要和格点数相关，而此次测试中我们都是用同样的格点数，因此其耗时基本不变，之后我们会比较在不同格点数情况下求解泊松方程的加速比变化。
 灰色柱行代表推动粒子的加速比，其随着粒子数目增加而变大，在粒子数较大时取得超过了70的加速比。
@@ -123,7 +123,7 @@
   \label{fig:PIC_speedup_Titan_160k_1}
 \end{figure}
 
-图\ref{fig:PIC_speedup_Titan_160k_2}和图\ref{fig:PIC_speedup_Titan_160k_1}类似，也是64*64*64各个点，160k个粒子下程序总耗时随着~GPU数目的变化。但是在图\ref{fig:PIC_speedup_Titan_160k_2}中，GPU数目大于等于2的时候，求解泊松方程使用域分解模式。其在各种情况下，都相较复制模式耗时更多，主要是拷贝数据花费了大量时间，这个结果和我们在小节\ref{section:PIC_GPU_Poisson}中讨论的相符。因此在之后的测试中，我们都使用复制模式。
+图\ref{fig:PIC_speedup_Titan_160k_2}和图\ref{fig:PIC_speedup_Titan_160k_1}类似，也是64*64*64各个点，160k个粒子下程序总耗时随着~GPU~数目的变化。但是在图\ref{fig:PIC_speedup_Titan_160k_2}中，GPU数目大于等于2的时候，求解泊松方程使用域分解模式。其在各种情况下，都相较复制模式耗时更多，主要是拷贝数据花费了大量时间，这个结果和我们在小节\ref{section:PIC_GPU_Poisson}中讨论的相符。因此在之后的测试中，我们都使用复制模式。
 
 \begin{figure}[!htb]
   \centering
@@ -619,27 +619,13 @@ GSI和CERN的研究人员也在实验上对 $I_{0;2,0}$ 和 $I_{2;0,2}$ 进行�
 \subsubsection{结构共振穿越速度和rms发射度增长}
 既然共振穿越无法避免，现在人们对于如何处理共振穿越仍然存在争议：是应该尽量绝热变化以达到更好的匹配，还是应该尽快完成穿越以减少束流在共振区的时间？
 FFAG中的单粒子运动表明共振穿越必须被仔细地研究~\cite{26}。在这里我们主要关注束流的均方根发射度与结构共振穿越速度之间的关系。
- With the same method to control the
-beam phase advance as in the above subsection, here, within total 400 FODO
-periods, the first N (N=10, 20, 50, 100, 200, 400) periods are adjusted to let
-the beam phase advance changes linearly from $75^\circ$ to  $95^\circ$ (below
-crossing) or from $95^\circ$ to $75^\circ$ (above crossing). Again, the final
-rms emittance growth after the total 400 periods is used as the evaluation of the beam quality.
+与上一小节中处理束流周期相移的方法相似，在这里，我们一使用400个FODO周期，其中前N个周期(N=10, 20, 50, 100, 200, 400)的束流周期相移线性的从$75^\circ$增加到  $95^\circ$（从下方穿越）或者从$95^\circ$ 减小到 $75^\circ$（从上方穿越），
+并使用400个周期后最终的rms发射度增长作为评价束流品质的标准。
 
-Figure~\ref{sfig:CrossingSpeed_byStopband1} shows the final emittance growth
-after 400 FODO periods as function of the number of periods (N) used for
-resonance crossing control.  With the same resonance crossing speed, the
-emittance growth from the above crossing is much larger than that from the below
-crossing, which indicates the same physics as we explained above in
-Fig.~\ref{fig:emittance}.
-For different resonance crossing speed, both below crossing and above crossing
-indicate that the structure resonance stop bands should be passed as quickly
-as possible to avoid significant emittance growth.
-Fig.~\ref{sfig:CrossingSpeed_byStopband2} shows the emittance growth as a
-function of the time that the beam spends within resonance stop band.
-Surprisingly, it is found that the emittance growth is almost linearly
-proportional to the time that the beam stays in the structure resonance
-stop band.
+图~\ref{sfig:CrossingSpeed_byStopband1}为最终发射度增长和渐变周期数N的关系。在相同的共振穿越速度下，从上方穿越的发射度增长远大于从下方穿越的发射度增长，这表明了和我们在图~\ref{fig:emittance}中解释的相同的物理机制。
+对于不同的共振穿越速度，从上方穿越和从下方穿越都表明束流应尽可能快地穿越结构共振禁带，以避免显著的发射度增长。
+图~\ref{sfig:CrossingSpeed_byStopband2}为发射度增长和束流在共振禁带内消耗的周期数的关系。
+令人惊讶的是，发射度增长与束流停留在结构共振禁带中的时间几乎线性相关。
 
 \begin{figure}[thbp]
     \centering
@@ -654,57 +640,28 @@ stop band.
         \label{sfig:CrossingSpeed_byStopband2}
     \end{subfigure}
     \caption{
-    a): The final emittance growth ratio after 400 FODO periods versus the
-    number of FODO periods used in resonance crossing control within 400 FODO
-    periods;
-    b): The final emittance growth ratio after 400 FODO periods versus the
-    effective number of periods that the beam is in the structure resonance
-    stop band.}
+    a): 400个FODO周期后的最终发射度增长率与用于共振跨越控制的~FODO周期数的关系;
+    b): 400个FODO周期后的最终发射率增长率与束流在结构共振禁带中的有效周期数的关系。}
     \label{fig:CrossingSpeed}
 \end{figure}
 
 \subsection{单粒子动力学 -- 非相干效应}
 \label{section:Crossing_Incoherent}
-From the incoherent single particle dynamics point of view, it is intuitive to
-attribute the 4-fold structure resonance to the 4th order particle-core
-resonance ($90^\circ/360^\circ=1:4$) since the phase advance discussed in this
-paper is mainly around $\sigma\sim90^\circ$
-\footnote{$360^\circ$ here is used to represent the frequency of the rms core
-oscillation. In one FODO period, the matched beam core oscillates once.}.
-Thus, the direction of the particle-core resonance islands moving towards or
-outward to the core during structure resonance crossing is adopted to interpret
-the formed 4-fold phase space structure \cite{25} and the severe difference of
-beam halo when structure resonance is crossed from below and above.
+从非相干单粒子动力学的角度来看，因为之前所讨论的周期相移主要在$\sigma\sim90^\circ$附近，人们很直观的会将4重结构共振归因于4阶particle-core 共振($90^\circ/360^\circ=1:4$)
+\footnote{$360^\circ$在这用来表示束核的震荡频率，即在一个FODO周期中完全匹配束流的束核震荡一次。}。
+因此，结构共振穿越过程中的particle-core共振岛向核心运动或向外运动的方向被用来解释所形成的四重相空间结构以及当结构共振从下方和上方穿越时束晕的严重差异~\cite{25} 。
 
-With the particle-core resonance model~\cite{27,28}, Fig.~\ref{fig:TestPtc}
-shows the Poincar\'{e} section plot of the single particle motion in phase
-space. Clearly, when the structure resonance is crossed from above, four
-particle-core resonance islands are generated in the origin point by a
-bifurcation process \cite{29,30} and the formed islands move outward the core
-during the structure resonance crossing process
-(Fig.~\ref{sfig:TestPtc1} $\rightarrow$ Fig.~\ref{sfig:TestPtc4}).
-In contrast, from the below crossing, the particle-core resonance islands move
-from outside into the inner core
-(Fig.~\ref{sfig:TestPtc4}$\rightarrow$Fig.~\ref{sfig:TestPtc1}).
-It is intuitive if one believes that the 4-fold phase space structure in phase
-space is related to this particle-core resonance, since this particle-core
-resonance can gradually bring particles in the core outside and form the stable
-4-fold phase space structure; In another case, if particle core resonance
-islands move from outside towards the inner core, since no particle is located
-outside initially, less particles will occupy the 4-fold islands and less halo
-particles are generated. However, this is misleading, because the fold
-structures are mainly related to the coherent collective effect rather than the
-incoherent particle-core resonance if the space charge is the only nonlinearity
-source in the beam system. For instance, this incoherent particle-core
-resonance cannot predict a two-fold phase space structure which actually
-appears in simulation both in below crossing and above crossing, as shown
-in Fig.~\ref{fig:Ptc2tail}.
-It is exactly the evidence of the 2nd order structure resonance -- coherent
-effect. As pointed out by our former study \cite{17}, we argue that the
-incoherent particle-core resonance might lead to the 4-fold phase space
-structure, but only on a long-time scale. Here, we believe that the formed
-4-fold phase space structure attained in simulation corresponds to the mixed
-4th/2nd collective structure resonance.
+图~\ref{fig:TestPtc}为使用particle-core共振模型的单粒子在相空间中的Poincar\'{e}截面~\cite{27,28}。
+很显然，当从上方穿越结构共振禁带时，通过分叉过程~\cite{29,30}在原点产生四个particle-core 共振岛，并在穿越过程中逐渐向外移动
+(图~\ref{sfig:TestPtc1} $\rightarrow$ 图~\ref{sfig:TestPtc4})。
+相反的，当从下方穿越时，particle-core 共振岛从外向核内移动
+(图~\ref{sfig:TestPtc4} $\rightarrow$ 图~\ref{sfig:TestPtc1})。
+人们直观上会认为相空间中的四重结构与这种particle-core共振有关。这一方面因为这种particle-core 共振可以逐渐将核心中的粒子带到外部并形成稳定的四重相空间结构；另一方面因为如果particle-core 共振岛从外部朝向内核移动，由于最初外部没有粒子，较少的粒子会占据四重共振岛并且生成更少的束晕。
+然而，这是不对的，因为如果空间电荷效应是束流系统中唯一的非线性效应，则N重共振岛结构主要取决于相干集体效应，而不是非相干 particle-core共振。
+例如，非相干 particle-core共振不能预测模拟中从下方穿越和从上方穿越都出现的的两重相位空间结构，如图~\ref{fig:Ptc2tail}所示，
+这正是二阶结构共振（相干效应）的证据。
+正如之前的研究~\cite{17}所指出的，我们认为，非相干 particle-core共振仅在长时间尺度上可能导致四重相空间结构。
+在这里，我们认为在模拟中形成的四重相空间结构对应于混合的二阶/四阶相干结构共振。
 
 \begin{figure}
     \centering
@@ -724,23 +681,23 @@ structure, but only on a long-time scale. Here, we believe that the formed
         \includegraphics[width=\textwidth]{Img/TestParticle4.pdf}
         \caption{}\label{sfig:TestPtc4}
     \end{subfigure}
-    \caption{Poinar\'{e} map from particle core model. Particle-core resonance islands move from inner core to outside in above crossing, Fig.~\ref{sfig:TestPtc1} $\rightarrow$ Fig.~\ref{sfig:TestPtc4}, and conversely in below crossing Fig.~\ref{sfig:TestPtc4}$\rightarrow$Fig.~\ref{sfig:TestPtc1}.}
+    \caption{使用particle-core模型得到的单粒子Poincar\'{e}截面。}
     \label{fig:TestPtc}
 \end{figure}
 
 \begin{figure}[!hbp]
     \centering
-    \begin{subfigure}[b]{0.33\textwidth}
+    \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{Img/7595Ptc002050.pdf}
-        \caption{}
+        \caption{从下向上穿越，205周期附近}
         \label{sfig:Ptc2tails1}
     \end{subfigure}
-    \begin{subfigure}[b]{0.33\textwidth}
+    \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{Img/9575Ptc001800.pdf}
-        \caption{}
+        \caption{从上向下穿越，180周期附近}
         \label{sfig:Ptc2tails2}
     \end{subfigure}
-    \caption{Phase space profiles around a) period 205 in crossing from below, b) period 180 in crossing from above.}
+    \caption{二重结构相空间分布}
     \label{fig:Ptc2tail}
 \end{figure}
 
