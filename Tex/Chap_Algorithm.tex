@@ -376,7 +376,7 @@ K_n = (\frac{2\pi n}{N_x \Delta _x}) \frac{\sin({\pi n}/{N_x})}{{\pi n}/{N_x}} \
 稳定性与误差随时间的变化有关。即使算法每一步的误差非常小，最终误差也有可能由于累积效应导致变大。
 在一个数值算法中，如果每一步的误差不会导致一个更大的累积误差，那么这个算法是稳定的。
 
-下面，我们讨论蛙跳法的稳定性。根据式\ref{eq:leapfrog_accuracy}，如果我们给定$\mathbf{x}_0 = \mathbf{X}_0,\mathbf{x}_1 = \mathbf{X}_1$作为初始条件，不考虑误差的情况下，我们可以得到之后的一系列解$\mathbf{X}_2,\mathbf{X}_3,\mathbf{X}_4,...$，其中：
+下面，我们讨论蛙跳法的稳定性。根据式\ref{eq:leapfrog_accuracy}，如果我们给定$\mathbf{x}_0 = \mathbf{X}_0,\mathbf{x}_1 = \mathbf{X}_1$作为初始条件，不考虑误差的情况下，我们可以得到之后的一系列解$\mathbf{X}_2$, $\mathbf{X}_3$, $\mathbf{X}_4,...$，其中：
       \begin{align}
          \label{eq:leapfrog_stability1}
          \mathbf{X}_{2}-2\mathbf{X}_{1}+\mathbf{X}_{0} &= \frac{\mathbf{F}(\mathbf{X}_1)}{m} {(\Delta T)^2} \\
@@ -423,7 +423,7 @@ K_n = (\frac{2\pi n}{N_x \Delta _x}) \frac{\sin({\pi n}/{N_x})}{{\pi n}/{N_x}} \
          \label{eq:leapfrog_stabilit10}
          {\epsilon}_{n+1}-2{\epsilon}_n+{\epsilon}_{n-1} = {\epsilon}_n \left. \frac{\partial\mathbf{F}}{\partial\mathbf{x}}\right|_{\mathbf{x}=\mathbf{X}^n} \frac{{(\Delta T)^2}}{m}
       \end{equation}
-上式并不能得到一个准确的误差递进关系，除非${\partial\mathbf{F}}/{\partial\mathbf{x}}$为常量。由于我们的目标是判断算法是否稳定，而不是算法有多稳定，所以我们考虑最坏的情况，使用$-|{\partial\mathbf{F}}/{\partial\mathbf{x}}|_{max}$代替${\partial\mathbf{F}}/{\partial\mathbf{x}}$，其中的负号是因为我们假设所计算的问题是有限边界，而不是会延伸到无穷远。可得误差随时间的变化方程：
+上式并不能得到一个准确的误差递进关系，除非${\partial\mathbf{F}}/{\partial\mathbf{x}}$为常量。由于我们的目标是判断算法是否稳定，而不是算法有多稳定，所以我们考虑最坏的情况，使用~$-|{\partial\mathbf{F}}/{\partial\mathbf{x}}|_{max}$~代替~${\partial\mathbf{F}}/{\partial\mathbf{x}}$~，其中的负号是因为我们假设所计算的问题是有限边界，而不是会延伸到无穷远。可得误差随时间的变化方程：
       \begin{align}
          \label{eq:leapfrog_stabilit11}
          {\epsilon}_{n+1}-2{\epsilon}_n+{\epsilon}_{n-1} &= -\left| \frac{\partial\mathbf{F}}{\partial\mathbf{x}}\right|_{max} \frac{{(\Delta T)^2}}{m} {\epsilon}_n \\
@@ -459,7 +459,7 @@ PIC算法是求解空间电荷效应非常快速有效的方法，在PIC算法�
 幸运的是，由于无网格算法很适合并行的特性，这种算法能够很好的被加速，并且有很好的可扩展性。
 下面，我们简要介绍保辛算法的基本原理。
 
-在束流动力学模拟中，当且仅当雅可比矩阵$M_i$满足以下条件时，传输矩阵$ m_i $才是保辛的\cite{accelerator2004lee, accelerator2013chao}：
+在束流动力学模拟中，当且仅当雅可比矩阵 $M_i$ 满足以下条件时，传输矩阵 $m_i$ 才是保辛的\cite{accelerator2004lee, accelerator2013chao}：
 \begin{equation}
 M_{i}^{T}J{{M}_{i}}=J
 \end{equation}
@@ -600,7 +600,7 @@ PIC有效地降低了计算量，成为了国际上主流的空间电荷效应�
 
 然而，由于PIC算法含有网格热噪声，会被引入一些非物理效应，我们引出了Symplectic模型。
 这种模型利用对粒子的高阶分解来求解空间电荷效应。
-相比PIC算法，Symplectic模型计算量要大得多，但是能够显著的降低~PIC算法中由于网格热噪声带来的发射度增长。
+相比 PIC 算法， Symplectic 模型计算量要大得多，但是能够显著的降低~PIC算法中由于网格热噪声带来的发射度增长。
 
 由于Symplectic算法计算量巨大，PIC算法也有提高效率的需求，我们研究对比了不同的计算机并行处理器。
 相比于CPU，GPU在逻辑判断上运算能力相对较弱，但是在并行计算密集型问题方面具有很大优势。

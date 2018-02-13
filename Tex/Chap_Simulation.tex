@@ -2,8 +2,7 @@
 随着加速器束流流强的增大，为了对束流进行精确的模拟和研究，我们需要模拟的粒子数目增加了几个量级。
 在这种趋势下，束流模拟软件的效率至关重要。
 第\ref{chap:Code}章介绍了束流模拟程序在GPU和CPU上的并行实现，
-在本章中，小节\ref{section:PIC_performance}和\ref{section:Symplectic_performance}将分别对PIC算法和Symplectic算法的GPU并行性能进行了测试。
-
+接下来，小节\ref{section:PIC_performance} 和 \ref{section:Symplectic_performance} 将分别对PIC算法和Symplectic算法的GPU并行性能进行了测试。
 之后，我们使用束流模拟软件研究了几个空间电荷相关的问题。
 首先，第\ref{section:3rd_order_simulation}节介绍了对空间电荷导致的三阶共振进行的模拟研究，
 之后，在第\ref{section:ADS_simulation}节我们使用P-TOPO程序对C-ADS的注入器I进行了模拟研究。
@@ -11,7 +10,7 @@
 \section{PIC算法性能}             \label{section:PIC_performance}
 
 \subsection{单GPU性能提升-GTX1060}
-首先，我们通过对比CPU程序和GPU程序的运行速度，来得到GPU程序的的加速比。加速比等于CPU程序耗时除以GPU程序耗时。测试使用的格点数为~ 64*64*64，图\ref{fig:PIC_speedup_1GPU}和表\ref{tab:PIC_speedup_1GPU}是粒子数从16k到1.6m时CPU程序和GPU程序各部分耗时以及加速比。程序消耗的总时间的加速比大约有40，然而每一部分的加速比有很大不同。
+首先，我们通过对比CPU程序和GPU程序的运行速度，来得到GPU程序的的加速比。加速比等于CPU程序耗时除以GPU程序耗时。测试使用的格点数为~ $64 \times 64 \times 64$，图\ref{fig:PIC_speedup_1GPU}和表\ref{tab:PIC_speedup_1GPU}是粒子数从16k到1.6m时CPU程序和GPU程序各部分耗时以及加速比。程序消耗的总时间的加速比大约有40，然而每一部分的加速比有很大不同。
 
 其中，橙色柱行代表求解泊松方程，其加速比大约是64，而且并不随粒子数目的变化而变化。事实上，求解泊松方程的计算量主要和格点数相关，而此次测试中我们都是用同样的格点数，因此其耗时基本不变，之后我们会比较在不同格点数情况下求解泊松方程的加速比变化。
 灰色柱行代表推动粒子的加速比，其随着粒子数目增加而变大，在粒子数较大时取得超过了70的加速比。
@@ -77,7 +76,7 @@
   \label{tab:PIC_speedup_1GPU}
 \end{table}
 
-权重差值和粒子信息输出的的加速比较低，从而拉低了整体的加速比。整体的加速比随着粒子数的增加而逐渐变小，其原因是当粒子数目较小时的时候，求解泊松方程所占得比重较大，从而整体加速比较大；而当粒子数目变大的时候，权重差值所占的时间比重变大，因而整体加速比随之变小。程序各部分耗时在不同粒子数所占比重如图\ref{PIC_speedup_1GPU_percentage}所示。
+权重差值和粒子信息输出的的加速比较低，从而拉低了整体的加速比。整体的加速比随着粒子数的增加而逐渐变小，其原因是当粒子数目较小时的时候，求解泊松方程所占得比重较大，从而整体加速比较大；而当粒子数目变大的时候，权重差值所占的时间比重变大，因而整体加速比随之变小。程序各部分耗时在不同粒子数所占比重如图\ref{fig:PIC_speedup_1GPU_percentage}所示。
 
 \begin{figure}[!htb]
     \centering
@@ -98,7 +97,7 @@
     \caption{程序各部分耗时在不同粒子数时所占百分比}\label{fig:PIC_speedup_1GPU_percentage}
 \end{figure}
 
-在上述测试中使用的都是64*64*64个格点数，因此求解泊松方程的时间和加速比都基本不变。在不同的格点数情况下，求解泊松方程的加速比如图\ref{fig:PIC_speedup_1GPU_Poisson}所示。可以看出，求解泊松方程的加速比随着格点数的增加逐渐变大，最终达到了接近70，这是因为格点数越大，其计算量越多，GPU上的负载能够分布得更均匀。在实际模拟中常用的64*64*64个格点和128*128*128个格点中，我们都取得了令人满意的加速比。
+在上述测试中使用的都是$64 \times 64 \times 64$个格点数，因此求解泊松方程的时间和加速比都基本不变。在不同的格点数情况下，求解泊松方程的加速比如图\ref{fig:PIC_speedup_1GPU_Poisson}所示。可以看出，求解泊松方程的加速比随着格点数的增加逐渐变大，最终达到了接近70，这是因为格点数越大，其计算量越多，GPU上的负载能够分布得更均匀。在实际模拟中常用的$64 \times 64 \times 64$个格点和$128 \times 128 \times 128$个格点中，我们都取得了令人满意的加速比。
 
 \begin{figure}[!htb]
   \centering
@@ -119,16 +118,16 @@
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.9\textwidth]{Img/PIC_speedup_Titan_160k_1.pdf}
-  \caption{64*64*64个格点，160k个粒子时，复制模式程序耗时随GPU个数的变化}
+  \caption{$64 \times 64 \times 64$个格点，160k个粒子时，复制模式程序耗时随GPU个数的变化}
   \label{fig:PIC_speedup_Titan_160k_1}
 \end{figure}
 
-图\ref{fig:PIC_speedup_Titan_160k_2}和图\ref{fig:PIC_speedup_Titan_160k_1}类似，也是64*64*64各个点，160k个粒子下程序总耗时随着~GPU~数目的变化。但是在图\ref{fig:PIC_speedup_Titan_160k_2}中，GPU数目大于等于2的时候，求解泊松方程使用域分解模式。其在各种情况下，都相较复制模式耗时更多，主要是拷贝数据花费了大量时间，这个结果和我们在小节\ref{section:PIC_GPU_Poisson}中讨论的相符。因此在之后的测试中，我们都使用复制模式。
+图\ref{fig:PIC_speedup_Titan_160k_2}和图\ref{fig:PIC_speedup_Titan_160k_1}类似，也是$64 \times 64 \times 64$各个点，160k个粒子下程序总耗时随着~GPU~数目的变化。但是在图\ref{fig:PIC_speedup_Titan_160k_2}中，GPU数目大于等于2的时候，求解泊松方程使用域分解模式。其在各种情况下，都相较复制模式耗时更多，主要是拷贝数据花费了大量时间，这个结果和我们在小节\ref{section:PIC_GPU_Poisson}中讨论的相符。因此在之后的测试中，我们都使用复制模式。
 
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.9\textwidth]{Img/PIC_speedup_Titan_160k_2.pdf}
-  \caption{64*64*64个格点，160k个粒子时，域分解模式程序耗时随GPU个数的变化}
+  \caption{$64 \times 64 \times 64$个格点，160k个粒子时，域分解模式程序耗时随GPU个数的变化}
   \label{fig:PIC_speedup_Titan_160k_2}
 \end{figure}
 
@@ -138,7 +137,7 @@
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.9\textwidth]{Img/PIC_speedup_Titan_1_6m.pdf}
-  \caption{64*64*64个格点，1.6m个粒子时，程序耗时随GPU个数的变化}
+  \caption{$64 \times 64 \times 64$个格点，1.6m个粒子时，程序耗时随GPU个数的变化}
   \label{fig:PIC_speedup_Titan_1_6m}
 \end{figure}
 
@@ -149,9 +148,12 @@
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.9\textwidth]{Img/PIC_speedup_Titan_16m.pdf}
-  \caption{64*64*64个格点，16m个粒子时，程序耗时随GPU个数的变化}
+  \caption{$64 \times 64 \times 64$个格点，16m个粒子时，程序耗时随GPU个数的变化}
   \label{fig:PIC_speedup_Titan_16m}
 \end{figure}
+
+%\subsection{多GPU性能提升-SummitDev}
+
 
 \section{Symplectic算法性能}      \label{section:Symplectic_performance}
 我们使用GPU程序的性能和可拓展性进行了两个测试，第一个测试使用一个普通的家用GPU：GTX 1060 6GB，测试的结果与在CPU串行运行的程序进行比较。第二个测试使用美国能源部下属的橡树岭国家实验室（ORNL）的GPU集群泰坦，用于测试程序的可扩展性，即程序在多GPU下的表现。
@@ -225,7 +227,7 @@
 \section{三阶共振模拟}            \label{section:3rd_order_simulation}
 我们使用Symplectic算法在周期聚焦结构中进行粒子跟踪和模拟。我们使零流强的周期相移为86.3259度，如果将10个周期视为一个环，则环的工作点为2.3979。随着流强的增加，相移会被压缩，工作点会在0.6A左右穿过2.3333的三阶共振线。环中还存在一个六极磁铁。
 
-图\ref{fig:emitGrowthCompare}为不同流强下的束流发射度增长变化，可以看到，发射度在流强为0.1A 和0.2A 时基本保持不变，这时的工作点约为2.40。但是发射度在流强为0.4A，0.6A，和0.8A时持续增长，这时的工作点在2.3333附近，可知其发射度增长是由于三阶共振导致。
+图\ref{fig:emitGrowthCompare}为不同流强下的束流发射度增长变化，可以看到，束流发射度在流强为 0.1A 和 0.2A 时基本保持不变，这时的工作点约为2.40。但是发射度在流强为0.4A, 0.6A, 和0.8A时持续增长，这时的工作点在2.3333附近，可知其发射度增长是由于三阶共振导致。
 
 \begin{figure}[!htb]
     \centering
@@ -296,7 +298,7 @@ C-ADS注入器I的基本参数如表\ref{tab:C_ADS_parameters}所示。其中RFQ
     \label{tab:C_ADS_parameters}
 \end{table}
 
-我们对RFQ和后面的超导段分别进行模拟，宏粒子数目为20000个，横向初始分布使用KV分布，纵向初始分布为均匀分布。使用实际运行的加速器结构，并且当粒子的横向位置触碰元件的孔径后标记为丢失，其中RFQ稍微严格对待，其孔径为当前cell的最小半径。空间电荷效应的网格数为64*64*64（x/y/z）。在RFQ段，我们不但使用P-TOPO程序，同时也使用Track程序\cite{aseev2005track}，以相同的初始条件进行模拟；同样的，在超导段，除了P-TOPO之外，我们还使用TraceWin\cite{uriot2014tracewin}来进行研究和对比。下面，我们对RFQ和超导段分别进行讨论。
+我们对RFQ和后面的超导段分别进行模拟，宏粒子数目为20000个，横向初始分布使用KV分布，纵向初始分布为均匀分布。使用实际运行的加速器结构，并且当粒子的横向位置触碰元件的孔径后标记为丢失，其中RFQ稍微严格对待，其孔径为当前cell的最小半径。空间电荷效应的网格数为$64 \times 64 \times 64$（x/y/z）。在RFQ段，我们不但使用P-TOPO程序，同时也使用Track程序\cite{aseev2005track}，以相同的初始条件进行模拟；同样的，在超导段，除了P-TOPO之外，我们还使用TraceWin\cite{uriot2014tracewin}来进行研究和对比。下面，我们对RFQ和超导段分别进行讨论。
 
 \subsection{RFQ模拟}
 在RFQ模拟中，RFQ中的场可由傅里叶贝塞尔方程的八项式得到，如式\ref{eq:RFQ_8terms}:
@@ -309,7 +311,7 @@ C-ADS注入器I的基本参数如表\ref{tab:C_ADS_parameters}所示。其中RFQ
     \end{aligned}
     \label{eq:RFQ_8terms}
 \end{equation}
-其中$I_n$为第n阶修正贝塞尔方程，$k=\pi /2\beta \gamma$,$A_mn$系数由RFQ设计程序PARMTEQM给出。
+其中$I_n$为第n阶修正贝塞尔方程，$k=\pi /2\beta \gamma$,$A_mn$系数由RFQ设计程序 PARMTEQM 给出。
 
 图\ref{fig:ADS_RFQ_emit}是P-TOPO和TRACK在0mA下和15mA下对RFQ模拟得到的横向和纵向发射度演化，其中红色实线为P-TOPO的结果而绿色虚线为TRACK的结果。在横向和纵向两个方向上，P-TOPO的发射度演变结果都更加光滑，尤其是在RFQ的前端。在此处，束流开始丝化形成束团，并且相空间开始剧烈旋转。P-TOPO与TRACK的结果误差在合理范围内。
 
@@ -452,7 +454,7 @@ V_1=\sum_{m=0}^{n}A_m(s)x^{n-m}y^m +\sum_{m=0}^{n-2}A_m^{(1)}(s)x^{n-m}y^m+\cdot
 为了简化，我们使束流在两个方向上的发射度相等，并使用对称的周期FODO聚焦结构（$k_x=k_y$）。
 
 \subsubsection{二阶集体效应}
-对于二阶偶数模，束流边界内部的扰动的空间电荷势为 $V_{2e}=A_0(s)x^2+A_2(s)y^2$；
+对于二阶偶数模，束流边界内部的扰动的空间电荷势为  $V_{2e} = A_0(s)x^2 + A_2(s)y^2$； 
 对于二阶奇数模，其为 $V_{2o}=A_1(s)xy$。
 动力学系统 $I'(s)=M(s)I(s)$ 可以得到 $(I_{0;2,0}, I_{2;0,2})$ 和  $(I_{1;1,1}, I_{1;1,-1})$ ，分别代表二阶偶数模和奇数模~\cite{11, 12, 18}。
 其雅克比矩阵$M(s)$可以表示为：
@@ -661,7 +663,7 @@ FFAG中的单粒子运动表明共振穿越必须被仔细地研究~\cite{26}。
 例如，非相干 particle-core共振不能预测模拟中从下方穿越和从上方穿越都出现的的两重相位空间结构，如图~\ref{fig:Ptc2tail}所示，
 这正是二阶结构共振（相干效应）的证据。
 正如之前的研究~\cite{17}所指出的，我们认为，非相干 particle-core共振仅在长时间尺度上可能导致四重相空间结构。
-在这里，我们认为在模拟中形成的四重相空间结构对应于混合的二阶/四阶相干结构共振。
+在这里，我们认为在模拟中形成的四重相空间结构对应于二阶/四阶混合相干结构共振。
 
 \begin{figure}
     \centering
@@ -704,43 +706,25 @@ FFAG中的单粒子运动表明共振穿越必须被仔细地研究~\cite{26}。
 
 \subsection{总结}
 \label{section:Crossing_Summary}
-As a follow-up to our previous analytical study of the structure resonance,
-this paper studies how the beam is spontaneously affected by the structure
-resonances. Since the analytical studies are based on the KV beam distribution
-assumption and the linearized perturbation theory, the nonlinear damping effect
-and the resonance saturation effect are not included.  The study in this paper
-clearly shows the transient behavior of the beam when the structure resonance
-stop band is crossed. The mixed 2nd/4th order coherent structure resonance
-gives quite reasonable explanation to the results obtained from the PIC
-simulations. It must be emphasized again that the interaction between the beam
-and the resonances needs to be studied in a transient sense. The ``attractive''
-and ``repulsive'' effect of the stop band is a spontaneous beam reaction since
-the rms characteristics are modified by the structure resonance. It is also
-found that the beam emittance growth is almost linearly proportional to the
-time that the beam is affected by the structure resonance. The final beam
-equilibrium status is a comprehensive result as a comprise of the structure
-resonance and the nonlinear damping. The incoherent particle-core resonance
-can cause phase space distortion, emittance growth, and beam halo formation,
-but only on a long-time scale.
+基于前人对结构共振的研究，本文研究了束流如何自发地受到结构共振的影响。
+由于之前的理论研究是基于KV分布和线性化的微扰理论，因此非线性阻尼效应和共振饱和效应并没有被包括在内。
+本文的研究清楚地揭示了束流穿越结构共振禁带时的瞬态行为。二阶/四阶混合相干结构共振对PIC模拟得到的结果给出了相当合理的解释。
+必须再次强调的是，束流和结构共振之间的相互作用需要在瞬态的意义上进行研究。 
+由于束流的均方根特性被结构共振所改变，共振禁带的“吸引”和“排斥”效应是束流的一种自发反应。
+研究还发现，束流的发射度增长几乎与束流受到结构共振影响的时间线性相关。 
+束流的最终平衡态是结构共振和非线性阻尼的综合结果。 
+非相干particle-core共振可能造成粒子相位空间扭曲、发射度增长、或形成束晕，但其需要一个较长的时间尺度。
 
-Another importance is that our simulation clearly proves the conclusion from
-our former theoretical prediction, that the lower order stop bands are
-naturally included in higher order stop bands.  The study on higher order of
-structure resonance can be easily extended and understood in the same frame
-discussed here.
-One example is the 3rd/6th mixed structure resonance around $60^{\circ}$
-phase advance $3 \times 60^{\circ} = 180^{\circ}$,
-$6 \times 60^{\circ} = 360^{\circ}$[16] and $120^{\circ}$ phase advance
-$3 \times 120^{\circ} = 360^{\circ}$, $6 \times 120^{\circ} = 720^{\circ}$
-~\cite{11,36}. The understanding of the coherent and incoherent resonance in
-space charge physics leads us to a better understanding of recent experimental
-results~\cite{31,32,33}. However, despite the progress in interpretation of the
-nonlinear phenomena, there is still a large gap between analytical, numerical
-prediction and the experiment. In the near future, further study will be focused
-on the extensive study on the real 6D particle dynamics.
+另一方面，我们的模拟清楚地证明了之前的理论预测，即低阶禁带自然地包含在高阶禁带中，
+关于高阶结构共振的研究可以在这个基础上更加轻松地扩展和理解。
+例如在 $60^{\circ}$周期相移附近（$3 \times 60^{\circ} = 180^{\circ}$, $6 \times 60^{\circ} = 360^{\circ}$）~\cite{16}和 $120^{\circ}$周期相移附近（$3 \times 120^{\circ} = 360^{\circ}$, $6 \times 120^{\circ} = 720^{\circ}$）~\cite{11,36}
+的三阶/六阶混合结构共振。
+而对与空间电荷相关的的相干和非相干共振的理解能够让我们更好地理解最近的实验结果~\cite{31,32,33}. 
+然而，尽管对非线性现象的解释有了一定进展，但是理论、数值模拟、和实验结果之间仍然存在着很大的距离。
+接下来，我们会对实际的6D粒子动力学做进一步的研究。
 
 \section{小结}                    \label{section:Simulation_conclusion}
-通过对并行程序的性能测试可以看出，对于PIC算法在单个普通家用GPU（GTX 1060）上相对于单核CPU实现了超过50倍的加速。
+通过对并行程序的性能测试可以看出，对于PIC算法，在单个普通家用GPU （GTX 1060） 上相对于单核CPU实现了超过50倍的加速。
 当模拟使用的粒子数较大时，PIC算法在GPU集群上也显示出良好的可扩展性；而当粒子数目较小时其可扩展性较差。
 
 对于Symplectic算法，在一个普通家用GPU上相对于单核CPU实现了接近500倍的加速比。
@@ -751,6 +735,7 @@ on the extensive study on the real 6D particle dynamics.
 
 之后，我们使用P-TOPO程序对C-ADS注入器I的RFQ和超导段分别进行了模拟并且与其他程序进行了比较。
 模拟结果证明了现有设计的合理性，束团的尺寸和发射度都得到了有效控制，束损以及能散也在合理范围之内，完全满足需求。
-之后，我们将继续对P-TOPO进行拓展并加入更多新的功能，以满足强流加速器的各种需求。
 
-最后，我们使用P-TOPO程序对加速器中的共振穿越进行了研究。
+最后，我们使用P-TOPO程序对加速器中的共振穿越进行了研究，清楚地揭示了束流穿越结构共振禁带时的瞬态行为，而束流的发射度增长几乎与束流受到结构共振影响的时间线性相关。 
+
+将来，我们将继续对P-TOPO进行拓展并加入更多新的功能，以满足强流加速器的各种需求，并实际的粒子动力学的研究做进一步的研究。
