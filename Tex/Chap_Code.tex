@@ -2,7 +2,7 @@
 \chapter{模拟程序设计及算法实现}
 \label{chap:Code}
 随着加速器的流强越来越高，束流模拟代码在束流动力学研究中的作用也越来越重要，
-尤其是在例如C-ADS，SNS，ESS等加速器中\cite{li2013physics,henderson2014spallation,eshraqi2016ess}，
+尤其是在例如C-ADS，SNS，ESS等加速器中\cite{li2013ADS,henderson2014SNS,eshraqi2016ess}，
 其非线性空间电荷效应占据主导地位。
 一个拥有更强大的计算能力以及更高的精确度的程序，是我们研究强流束流动力学所必须的。
 
@@ -285,8 +285,7 @@ PIC算法主要包括四部分：权重差值，解泊松方程，将场反权�
 \label{section:PIC_GPU_Poisson}
 在将粒子权重到网格上之后，下一步即解网格上的泊松方程。在单GPU上运行的版本我们在此不再赘述，而在多GPU上的并行版本和权重差值相似，也存在两种方法：一种是参考经典的CPU上的PIC程序，使用不同的GPU处理不同的空间域，即“域分解模式”；另外一种是简单直接的使所有GPU做同样的工作，即“复制模式”。由于解泊松方程的运算量较大，是PIC方法中很重要的一步，我们对两种模式都进行了实现并进行了比较。
 
-\subsubsection{域分解模式与复制模式}
-域分解的优点在于，通过使用不同的GPU处理不同的空间域，每个GPU可以降低计算量，从而提高程序运行速度；缺点也很明显，域分解模式需要不同GPU之间的信息交换，而在目前GPU与GPU之间，特别是在不同节点之间，并不能直接进行信息交换，而是必须通过CPU来进行，即信息交换需要三步：
+域分解的优点在于，通过使用不同的GPU处理不同的空间域，每个GPU可以降低计算量，从而提高程序运行速度；其缺点也很明显，域分解模式需要在不同的GPU 之间交换信息，而在目前GPU与GPU之间，特别是在不同节点之间，并不能直接进行信息交换，而是必须通过CPU来进行，即信息交换需要三步：
 \begin{enumerate}
   \item 从GPU内存拷贝到CPU内存。
   \item CPU和CPU之间的通过MPI进行信息交换。
@@ -329,137 +328,9 @@ PIC算法主要包括四部分：权重差值，解泊松方程，将场反权�
   \item Y方向的FFT（$64 \times 64 \times 64$）
   \item Z方向的FFT（$64 \times 64 \times 64$）
 \end{enumerate}
-\subsubsection{单GPU测试}
-我们在单GPU上对域分解模式进行了测试，并统计了每一部分所花费的时间。测试的格点数为$64 \times 64 \times 64$，每部分所花费的时间如表\ref{tab:1GPU_Poisson}，表中的单位为秒，每部分占比如图\ref{fig:1GPU_Poisson}。
 
-\begin{table}[!htbp]
-    \centering
-    \footnotesize% fontsize
-    \setlength{\tabcolsep}{4pt}% column separation
-    \renewcommand{\arraystretch}{1.2}%row space
-    \begin{tabular}{lc}
-        \hline\hline
-        从CPU拷贝到GPU    & 1.306     \\
-        \hline
-        从GPU拷贝到CPU    & 2.979     \\
-        \hline
-        FFT计算           & 0.487     \\
-        \hline
-        转置和通讯        & 3.772     \\
-        \hline
-        总计              & 8.544    \\
-        \hline\hline
-    \end{tabular}
-    \caption{单GPU域分解模式解泊松方程}
-    \label{tab:1GPU_Poisson}
-\end{table}
+我们将在第\ref{section:PIC_performance_Poisson}节介绍更详细的性能比较。
 
-\begin{figure}[!htb]
-    \centering
-    \includegraphics[width=0.7\textwidth]{Img/domain_decomposition_1GPU.pdf}
-    \caption{单GPU域分解模式解泊松方程各部分时间占比}\label{fig:1GPU_Poisson}
-\end{figure}
-
-可以看出，FFT计算所花的时间为0.487秒，相比于额外增加的数据拷贝时间1.306 + 4.627 = 4.933秒，其占比非常小，仅仅占总时间的6\%。
-
-多GPU的一种方式是使用同一节点内使用多个GPU，因为节点内的总线宽度限制，数据拷贝时间并不会随着使用GPU数目的增加而明显减少。而复制模式只需要花费FFT计算的时间，因为FFT计算花费的时间0.487秒远小于数据拷贝的时间4.933秒，所以即使在理想情况下使用N个GPU时FFT计算的时间减少到原来的1/N，域分解模式的总时间依然是比复制模式要大。
-
-多GPU的另一种使用跨节点的多个GPU，即每个节点有1个GPU，通过使用多个节点来使用多个GPU，这也是目前超级计算机TITAN的运行模式。总线宽度会随着节点数增加而增加，所以数据拷贝时间会下降，假设其下降为现行的，即在N个节点上运行的话拷贝数据时间只有原来的1/N，则总时间将会是 $4.933/N+0.487/N$，如果我们想要取得优于复制模式的速度，即 $4.933/N+0.487/N<0.487$， GPU数目必须大于11。类似的，如果我们想要取得两倍的速度，GPU数目必须大于22。然而，这个计算忽略了CPU和CPU之间的通讯时间，一般来说，节点间的通讯时间随着节点数目增加而增加，因此我们很难取得理想情况的加速比。
-
-下面，我们分别对节点内多GPU和跨节点GPU进行测试。
-
-\subsubsection{单节点多GPU测试}
-在同一节点中，我们进行了格点数为$64 \times 64 \times 64$的多GPU测试，表\ref{tab:2GPU_Poisson}是各个部分所花费的时间，以及和单GPU时的对比。可以看出，双GPU的总时间更大了，由8.544秒增加到了9.537秒。其中，FFT计算的时间有0.487秒减少到了0.249秒，几乎减少了一半，证明了多GPU对于减少纯FFT计算时间是确实有效的；对于数据拷贝时间，双GPU略有减少，大概减少了三分之一；总时间中增加的部分来源于转置和通讯的时间，几乎增加了一倍。
-\begin{table}[!htbp]
-    \centering
-    \footnotesize% fontsize
-    \setlength{\tabcolsep}{4pt}% column separation
-    \renewcommand{\arraystretch}{1.2}%row space
-    \begin{tabular}{lcc}
-        \hline\hline
-                          & 1GPU    & 2GPU   \\
-        \hline\hline
-        从CPU拷贝到GPU    & 1.306   & 0.817  \\
-        \hline
-        从GPU拷贝到CPU    & 2.979   & 1.991  \\
-        \hline
-        FFT计算           & 0.487   & 0.249  \\
-        \hline
-        转置和通讯        & 3.772   & 6.480  \\
-        \hline
-        总计              & 8.544   & 9.537  \\
-        \hline\hline
-    \end{tabular}
-    \caption{单节点双GPU域分解模式解泊松方程}
-    \label{tab:2GPU_Poisson}
-\end{table}
-
-\subsubsection{跨节点多GPU测试}
-我们使用超级计算机泰坦（Titan）来进行域分解模式下的解泊松方程在跨节点多GPU上的效率。泰坦是一台由克雷公司承建的超级电脑，置放于美国能源部下属的橡树岭国家实验室中，使用由超微半导体提供的皓龙（Opteron）处理器链接英伟达提供的Tesla运算用GPU以进行协同运算。
-
-首先，我们测试了常用的$64 \times 64 \times 64$个格点下，域分解模式下解泊松方程所花费的时间随GPU个数的变化，如图\ref{fig:TITAN_GPU_Poisson64}所示，图中蓝线为总时间，各个柱代表各个部分所花费的时间，在GPU数目很大时，图中不清楚部分可以参考表\ref{tab:TITAN_GPU_Poisson64}。
-
-可以看出，花费的总时间随着GPU数目增加而逐渐减少，并在32个GPU的时候到达最小值，随后开始逐渐增加。其中，拷贝数据所花费的时间基本随着GPU的数目线性减少；而通讯所花费的时间先随着GPU数目增加而逐渐减少，到达极值后又开始逐渐增加，此时通讯时间占程序所花费的时间的绝大部分；FFT计算所花费的时间随着GPU数目的增加而逐渐减少，但是FFT计算占总时间的百分比很小。
-
-\begin{figure}[!htb]
-  \centering
-  \begin{tabular}{|l|l|}
-    \multicolumn{2}{c}{
-    \includegraphics[width=0.9\textwidth]{Img/domain_decomposition_Titan64.pdf}} \\
-  \end{tabular}
-  \caption{$64 \times 64 \times 64$格点下，跨节点多~GPU~域分解模式解泊松方程时间随~GPU~个数的变化}
-  \label{fig:TITAN_GPU_Poisson64}
-\end{figure}
-
-\begin{table}
-  \centering
-  \begin{tabular}{|l|c|c|c|c|c|c|c|}
-    \hline
-    GPU数目	    &1	    &2	    &4	    &8 	    &16	    &32  	&64   \\
-    \hline
-    CPU to GPU	&2.111	&0.922	&0.390	&0.158	&0.061	&0.031	&0.0155 \\
-    GPU to CPU	&1.618	&0.694	&0.314	&0.167	&0.066	&0.033	&0.0158 \\
-    FFT计算  	    &0.266	&0.136	&0.069	&0.039	&0.024	&0.017	&0.0150 \\
-    转置和通讯	&4.02	&5.521	&2.415	&1.146	&0.691	&0.572	&0.6320 \\
-    总计	        &8.015	&7.273	&3.188	&1.51	&0.842	&0.653	&0.6783 \\
-    \hline
-  \end{tabular}
-  \caption{$64 \times 64 \times 64$格点下，跨节点多GPU 域分解模式解泊松方程各部分所用时间}
-  \label{tab:TITAN_GPU_Poisson64}
-\end{table}
-
-我们也测试了更多格点数目时的情况，格点数目越多，所需要的计算量越大。当格点数为$128 \times 128 \times 128$时，程序在不同的GPU数目下消耗的时间如图\ref{fig:TITAN_GPU_Poisson128}和表\ref{tab:TITAN_GPU_Poisson128}所示，其整体的趋势和$64 \times 64 \times 64$时类似，因为更大的计算量，其总时间在使用128个GPU时到达最小值。
-
-\begin{figure}[!htb]
-  \centering
-  \begin{tabular}{|l|l|}
-    \multicolumn{2}{c}{
-    \includegraphics[width=0.9\textwidth]{Img/domain_decomposition_Titan128.pdf}} \\
-  \end{tabular}
-  \caption{$128 \times 128 \times 128$格点下，跨节点多~GPU~域分解模式解泊松方程时间随~GPU~个数的变化}
-  \label{fig:TITAN_GPU_Poisson128}
-\end{figure}
-
-\begin{table}
-  \centering
-  \begin{tabular}{|>{\small}l|c|c|c|c|c|c|c|c|c|}
-    \hline
-    GPU数目	    &1	    &2	    &4	    &8 	    &16	    &32  	&64     &128	&256   \\
-    \hline
-    CPU to GPU	&18.29	&8.687	&3.946	&2.023	&0.953	&0.404	&0.148	&0.064	&0.033 \\
-    GPU to CPU	&13.11	&6.15	&2.618	&1.463	&0.795	&0.368	&0.139	&0.07	&0.036 \\
-    FFT计算  	&2.185	&1.034	&0.522	&0.266	&0.138	&0.071	&0.036	&0.021	&0.017 \\
-    转置和通讯	&59.99	&79.34	&51.85	&23.30	&9.797	&4.041	&2.237	&1.859	&2.506 \\
-    总计	    &93.58	&95.21	&58.94	&27.05	&11.68	&4.884	&2.56	&2.014	&2.592\\
-    \hline
-  \end{tabular}
-  \caption{$128 \times 128 \times 128$格点下，跨节点多GPU域分解模式解泊松方程各部分所用时间}
-  \label{tab:TITAN_GPU_Poisson128}
-\end{table}
-
-在$64 \times 64 \times 64$和$128 \times 128 \times 128$两种情况下，总时间开始都随着GPU数目增加而减小，然后到达最小值，随后由于通讯所需要的时间变大，总时间也随之变大。
-\subsubsection{小结}
-通过上面对于“域分解模式”的实现和测试，可以看出其主要受限于CPU和 GPU之间数据拷贝的速度与CPU和CPU之间的通讯速度。如果GPU带宽足够大，或者以后能够实现GPU与GPU之间的直接通讯的话，“域分解模式”可以作为一个可行的方案。但是在目前，与“复制模式”的比较，“域分解模式”由于其额外的数据拷贝和通讯开销，并不能通过减少运算量来达到提高速度的目的。所以我们在程序中依然使用“复制模式”，即使所有的GPU都同时运行同样的程序。
 
 \subsection{粒子推动}
 在小节\ref{section:PIC_GPU_depositor}粒子权重过程中，粒子是按照区块排列的。因此在推动粒子的时候，直接的方法是像权重过程中一样，由每个线程处理一个区块中的粒子。然而这种方法的缺陷是每个线程上的负载不均匀，可能出现某些区块中粒子数很多从而其线程运算量很大，然而另外某些区块中的粒子数较少，其线程运算量很小的情况。为了保证负载的均衡，我们采取另外一种方法，先把区块中的粒子信息重组，拷贝到一个典型的6*N的连续数组中，其中N是粒子数，6是维度；然后再并行推动。这种方法虽然需要额外的时间进行数据拷贝，但是相比第一种区块推动的负载更均匀，所以整体时间比区块推动更短，其流程如下所示：
