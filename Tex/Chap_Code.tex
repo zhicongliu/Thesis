@@ -361,95 +361,17 @@ PIC算法主要包括四部分：权重差值，解泊松方程，将场反权�
     \caption{PIC算法在GPU上的正确性校验}\label{fig:PIC_GPU_benchmark}
 \end{figure}
 
-\section{PIC算法在CPU集群上的实现}        \label{section:PIC_CPUcluster}
-为了和GPU做比较，我们也在CPU集群上实现了PIC程序，其使用的计算机为Cori Knight Landing，使用的是Intel最新的众核处理器，每个处理器有68个核心。
-我们的程序使用和MPI和OpenMP混合并行，以提高运行的效率。
+\section{PIC算法在CPU集群上的实现}        \label{section:PIC_Code_CPUcluster}
+除了GPU集群之外，PIC代码还在基于英特尔众核（MIC）技术的超级计算机Cori Knight Landing（KNL）上进行了移植和测试。
+我们将OpenMP（OMP）指令添加到原先的纯MPI代码中，使用和MPI和OpenMP混合并行，以适应MIC架构，提高运行的效率。
 
-首先，我们在一个节点上研究不同OpenMP线程数和MPI进程数下程序的效率和内存占用情况，并找到最优混合并行配置。之后，我们使用多个节点，研究程序在不同节点数下的效率变化。
-
-\subsection{单节点}
-首先，我们使用$64 \times 64 \times 64$个网格，在1.6m粒子数下测试不同的混合并行配置，如图\ref{fig:PIC_speedup_Cori_1node_1_6m}所示。其中横轴为不同的并行配置，MPI进程数由1指数增加到64，而~OpenMP~线程数有64指数得减小到1，线程数乘以进程数则保持不变。在每种并行配置下，总时间（浅蓝色实线），和权重差值，求解泊松方程，推动粒子，信息输出（各色柱行）所耗时间由左纵轴以秒为单位表示，而内存占用（绿色实线）由右纵轴以GB为单位表示。
-
-\begin{figure}[!htb]
-  \centering
-  \includegraphics[width=0.9\textwidth]{Img/PIC_speedup_Cori_1node_1_6m.pdf}
-  \caption{1.6m粒子数下，不同混合并行配置的耗时与内存占用}
-  \label{fig:PIC_speedup_Cori_1node_1_6m}
-\end{figure}
-
-从图\ref{fig:PIC_speedup_Cori_1node_1_6m}可以看出，除了纯OpenMP并行（MPI=1，OMP=64）明显较慢外，其他各个并行配置下所消耗的总时间的差别并不大，
-其中耗时最小的并行配置为使用32个MPI进程，每个进程使用2个OpenMP线程。一般而言，使用较大的MPI进程数是比较有效率的选择。
-而内存占用基本随着MPI进程数目线性增加。
-
-
-
-程序的不同部分对于并行配置的反应并不相同。随着MPI进程数的增加和每个进程所用线程数的减小，权重差值的耗时先减小后增加，一开始先从MPI=64，OMP=1时的1.14秒减少到了MPI = 8，OMP =8时的0.58秒，然后其开始剧烈增加，最终到达MPI = 1，OMP =64时的4.85秒。其原因是权重差值需要在不同的线程之间进行归约以避免线程冲突，而归约操作在线程数很大时有一个较大的启动时间。粒子推动耗时随着MPI数变大单调增加，这是因为OpenMP更适合Knight Landing众核架构，并能更有效的利用矢量处理器。
-
-我们也测试了不同的粒子数下的并行配置，测试的粒子数为160k和16m，分别是之前粒子数的十分之一和十倍，其结果如图\ref{fig:PIC_speedup_Cori_1node_160k}和图\ref{fig:PIC_speedup_Cori_1node_16m}所示。
-在160k个粒子的情况下，总时间随着MPI进程数的增加单调减少，这表明小粒子数情况更适合纯MPI并行。
-而在1.6m个粒子的情况下，纯OpenMP并行由于无MPI进程间通讯，显示出一些优势，但是其总耗时依然大于MPI并行，其耗时最小的配置为MPI=64，OMP=1。
-
-\begin{figure}[!htb]
-  \centering
-  \includegraphics[width=0.9\textwidth]{Img/PIC_speedup_Cori_1node_160k.pdf}
-  \caption{160k粒子数下，不同混合并行配置的耗时与内存占用}
-  \label{fig:PIC_speedup_Cori_1node_160k}
-\end{figure}
-
-\begin{figure}[!htb]
-  \centering
-  \includegraphics[width=0.9\textwidth]{Img/PIC_speedup_Cori_1node_16m.pdf}
-  \caption{16m粒子数下，不同混合并行配置的耗时与内存占用}
-  \label{fig:PIC_speedup_Cori_1node_16m}
-\end{figure}
-
-在各种情况下，无论粒子数多少，内存占用总是随着MPI进程数变大而单调增加。
-\subsection{多节点}
-从上面单节点的测试中可以得到，使用较大的MPI进程数和较小的OpenMP 线程数是更有效率的并行配置。
-因此在多节点的测试中，我们首先选用纯MPI并行，测试在不同的节点数下程序总体以及各个部分的耗时情况。之后，我们也测试了OMP=2和OMP=4的情况，并与纯MPI程序进行了比较。
-
-图\ref{fig:PIC_speedup_Cori_scalability}是纯MPI配置下PIC程序在CPU集群多节点下的耗时情况。每个节点我们使用64个核，图\ref{fig:PIC_speedup_Cori_scalability}的横轴为节点数目；左纵轴为时间，以秒为单位；右纵轴为内存使用，以GB为单位。随着使用更多的节点，程序总耗时先降低后增加，在32个节点处到达最小值。总耗时先减小是因为使用的节点数越多，每个节点上需要进行的运算越少；后增加是因为随着节点数上升，节点间的通讯时间也会随之增加。图\ref{fig:PIC_speedup_Cori_percetage_64nodes}为使用64个节点时程序各个部分消耗时间所占的百分比，可以看出此时通讯耗时已经占了总耗时的60\%。
-
-\begin{figure}[!htb]
-  \centering
-  \includegraphics[width=0.9\textwidth]{Img/PIC_speedup_Cori_scalability.pdf}
-  \caption{PIC程序使用多个CPU节点的耗时}
-  \label{fig:PIC_speedup_Cori_scalability}
-\end{figure}
-
-\begin{figure}[!htb]
-  \centering
-  \includegraphics[width=0.5\textwidth]{Img/PIC_speedup_Cori_percetage_64nodes.pdf}
-  \caption{使用64个节点时程序各个部分消耗时间所占的百分比}
-  \label{fig:PIC_speedup_Cori_percetage_64nodes}
-\end{figure}
-
-接下来，我们对OMP=2和OMP=4的并行配置进行了测试，并与纯MPI程序（OMP=1）进行了比较，如图\ref{fig:PIC_speedup_Cori_multi_nodes_timeMemory}所示。
-在大部分情况下，不同并行的耗时差别很小；但是在某些情况下差别很大，比如节点数为16时，纯MPI的速度是OMP=4的 1.8倍。
-对于内存使用情况， 使用更多的OpenMP线程和更少的MPI进程总是占优势。
-综合考虑，在内存足够大的情况下，在Knight Landing上运行的PIC程序使用纯MPI并行配置依然是一个很好的选择。
-
-\begin{figure}[!htb]
-    \centering
-    \begin{subfigure}[b]{0.48\textwidth}
-        \includegraphics[width=\textwidth]{Img/PIC_speedup_Cori_multi_nodes_time.pdf}
-        \caption{耗时}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.48\textwidth}
-        \includegraphics[width=\textwidth]{Img/PIC_speedup_Cori_multi_nodes_memory.pdf}
-        \caption{内存占用}
-    \end{subfigure}
-    \caption{不同并行配置下的多节点运行情况比较}
-    \label{fig:PIC_speedup_Cori_multi_nodes_timeMemory}
-\end{figure}
-
-\subsection{与GPU对比}
-
-在本章之前的测试中，我们使用的GPU型号为Nvidia GeForce GTX 1060，其包含1280颗核心，时钟频率为1.71GHz。而我们使用的CPU型号为Intel® Xeon Phi™ Processor 7250 ("Knights Landing")，共包含68颗核心，时钟频率为1.40GHz，但是实际上，我们只是使用了64颗核心。
-
-而由于GPU程序做了一些简化，缺少一部分步骤，例如粒子丢失判据等，我们在进行比较的时候也在CPU程序的耗时中减去了相应部分。
-在$64 \times 64 \times 64$个格点数，1.6m个粒子的情况下，对于同样长度的加速器，使用一个GPU代码的总耗时为3.56秒，这类似于CPU程序在300个核心上的运行时间。换而言之，对于我们的PIC程序，一个GPU卡的运算效率与4到8个CPU节点的运行效率相当。
-
+新的MPI/OpenMP混合PIC程序提供了节点间和节点内的两级并行机制，它结合了进程级的粗粒度并行和线程级的细粒度并行。
+我们对 MPI 进程数量和 OpenMP 线程数量之间的平衡进行了精细调整，在一个节点上研究了不同OpenMP线程数和MPI进程数下程序的效率和内存占用情况，并找到最优混合并行配置。。
+对于程序中某些部分（如权重差值）中可能存在的线程竞争条件，我们使用了OpenMP内置的归约操作和原子操作符。 
+而且，程序使用了新的编译器，以充分利用KNL上的512位矢量协处理器。它可以显着提高程序中循环块的速度，其通常是整个程序耗时最长的部分。
+KNL有16 GB的板载多通道DRAM（MCDRAM）内存，其带宽超过460 GB/s。MCDRAM有两种模式：“缓存模式”（作为L3缓存）或“平坦模式”（作为更快的内存）。我们对这两种模式都进行了测试，最后程序选择以“缓存模式”使用MCDRAM以获得较高的效率。
+之后，我们使用多个节点，研究程序在不同节点数下的效率变化。
+我们将在第\ref{section:PIC_Performance_CPUcluster}节介绍更详细的性能研究。
 
 \section{Symplectic算法在GPU上的实现}     \label{section:symplectic_GPU}
 Symplectic算法非常适合使用GPU进行加速计算。通过使用CUDA和GPU，可以显著加快无网格粒子跟踪代码的运行速度。当运行在单个GTX 1060时，与CPU串行相比，GPU代码实现了超过400倍的加速。此外，加速比会随着GPU的数目线性增长。
@@ -546,8 +468,11 @@ e{{p}_{i}}=\sum\limits_{j}{e{{p}_{i}}^{temp,j}}
 分成若干部分分别计算也有相应的缺点，分开计算需要更多的内存空间来保存~${e{{p}_{i}}^{temp,j}}$。额外的内存使用量与粒子数和阶数成正比。在相同的的内存大小分别计算的最大粒子数会比直接计算的减少约为20％。
 
 \section{小结}                            \label{section:Code_conclusion}
-本章介绍了根据PIC算法编写的粒子模拟程序P-TOPO，主要处理强流加速器中的非线性效应。
-P-TOPO的PIC部分和整体正确性都得到了验证。
-在GPU上，我们使用CUDA库实现了基于PIC方法的多粒子模拟程序，并优化了GPU代码结构，使用特定的并行策略避免了线程竞争，是程序的性能得以提高。
-我们也新的CPU架构Cori Knight Landing上实现了PIC程序，并探索了其最佳性能的并行线程配置。通过比较，单GPU运行的程序和使用4或8个节点的程序性能相当。
-我们使用CUDA库在GPU上实现了Symplectic算法。由于其算法结构非常适合使用GPU进行加速计算，程序总体加速比接近500。
+本章首先介绍了根据PIC算法编写的粒子模拟程序P-TOPO，这个程序主要目标是处理强流加速器中的非线性效应，其部分和整体正确性都得到了验证。
+基于PIC算法提高效率的需求，我们在不同的并行计算机平台上对PIC程序进行了实现。
+在GPU上，我们使用CUDA库实现了基于PIC方法的多粒子模拟程序，并优化了GPU代码结构，使用特定的并行策略避免了线程竞争，使程序的性能得以提高。
+我们也新的CPU集群Cori Knight Landing上实现了PIC程序，并探索了其最佳性能的并行线程配置。
+
+最后，我们使用CUDA库在GPU上对Symplectic算法进行了实现。
+由于Symplectic算法计算量巨大，而GPU在并行计算密集型问题方面具有很大优势。
+因此Symplectic算法结构非常适合使用GPU进行加速计算。

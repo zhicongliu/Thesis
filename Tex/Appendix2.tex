@@ -1,24 +1,29 @@
 
-\chapter{The explicit form of the 2nd order Jacobi Matrix for collective mode analysis.}
+\chapter{二阶集体模的雅克比矩阵}
+
 \label{appdendix:Jacobi}
-Note $C_{i,j}=i/\beta_x+j/\beta_y$ for simplicity, for the 2nd order even mode:
-\begin{eqnarray}\label{eq6.1}
-J_{21} &=& - C_{2,0}^2 - C_{2,0} \frac{2 K}{\epsilon_x} \frac{a (2a+b) }{2  (a+b)^2} \nonumber  \\
-J_{22} &=& \frac{C_{2,0}'}{C_{2,0}} \nonumber  \\
-J_{23} &=& - C_{2,0} \frac{2 K}{\epsilon_x} \frac{a b }{2 (a+b)^2} \nonumber  \\
-J_{41} &=& - C_{0,2} \frac{2 K}{\epsilon_x} \frac{a b }{2 \Gamma (a+b)^2} \nonumber  \\
-J_{43} &=& - C_{0,2}^2 - C_{0,2} \frac{2 K}{\epsilon_x} \frac{ b(a+b) }{2 \Gamma (a+b)^2} \nonumber  \\
-J_{44} &=& \frac{C_{0,2}'}{C_{0,2}};
-\end{eqnarray}
-For the 2nd order odd mode,
-\begin{eqnarray}\label{eq6.2}
-J_{21} &=& - C_{1,1}^2 - C_{1,1} \frac{2 K}{\epsilon_x} \frac{a b (1+\Gamma)}{2 \Gamma (a+b)^2} \nonumber  \\
-J_{22} &=& \frac{C_{1,1}'}{C_{1,1}} \nonumber  \\
-J_{23} &=& - C_{1,1} \frac{2 K}{\epsilon_x} \frac{a b (-1+\Gamma)}{2 \Gamma (a+b)^2} \nonumber  \\
-J_{41} &=& - C_{1,-1} \frac{2 K}{\epsilon_x} \frac{a b (1+\Gamma)}{2 \Gamma (a+b)^2} \nonumber  \\
-J_{43} &=& - C_{1,-1}^2 - C_{1,-1} \frac{2 K}{\epsilon_x} \frac{a b (-1+\Gamma)}{2 \Gamma (a+b)^2} \nonumber  \\
-J_{44} &=& -\frac{C_{1,-1}'}{C_{1,-1}}.
-\end{eqnarray}
-Here $K$ is the generalized  perveance,  $a$ and $b$ are the beam size during one period, $\Gamma=\epsilon_x/\epsilon_y$ is the emittance ratio between different degrees of freedom. In this paper, $\Gamma=1$ is selected for analysis.
+记 $C_{i,j}=i/\beta_x+j/\beta_y$，则对于二阶偶数模：
+\begin{equation}\label{eq:Jacobi_even}
+\begin{split}
+J_{21} &= - C_{2,0}^2 - C_{2,0} \frac{2 K}{\epsilon_x} \frac{a (2a+b) }{2  (a+b)^2}   \\
+J_{22} &= \frac{C_{2,0}'}{C_{2,0}}   \\
+J_{23} &= - C_{2,0} \frac{2 K}{\epsilon_x} \frac{a b }{2 (a+b)^2}  \\
+J_{41} &= - C_{0,2} \frac{2 K}{\epsilon_x} \frac{a b }{2 \Gamma (a+b)^2}   \\
+J_{43} &= - C_{0,2}^2 - C_{0,2} \frac{2 K}{\epsilon_x} \frac{ b(a+b) }{2 \Gamma (a+b)^2} \\
+J_{44} &= \frac{C_{0,2}'}{C_{0,2}};
+\end{split}
+\end{equation}
+则对于二阶奇数模：
+\begin{equation}\label{eq:Jacobi_odd}
+\begin{split}
+J_{21} &= - C_{1,1}^2 - C_{1,1} \frac{2 K}{\epsilon_x} \frac{a b (1+\Gamma)}{2 \Gamma (a+b)^2}   \\
+J_{22} &= \frac{C_{1,1}'}{C_{1,1}} \\
+J_{23} &= - C_{1,1} \frac{2 K}{\epsilon_x} \frac{a b (-1+\Gamma)}{2 \Gamma (a+b)^2}  \\
+J_{41} &= - C_{1,-1} \frac{2 K}{\epsilon_x} \frac{a b (1+\Gamma)}{2 \Gamma (a+b)^2}  \\
+J_{43} &= - C_{1,-1}^2 - C_{1,-1} \frac{2 K}{\epsilon_x} \frac{a b (-1+\Gamma)}{2 \Gamma (a+b)^2} \\
+J_{44} &= -\frac{C_{1,-1}'}{C_{1,-1}}.
+\end{split}
+\end{equation}
+其中， $K$为广义导流系数， $a$ 和 $b$ 为一个周期内的束流尺寸，  $\Gamma=\epsilon_x/\epsilon_y$ 为两个自由度发射度的比值。在本文中，我们使用对称束流，即 $\Gamma=1$。
 
 
