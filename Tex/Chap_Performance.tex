@@ -34,6 +34,7 @@ Cori Knight Landing（KNL）是Cori的新计算平台，位于美国国家能源
     \footnotesize% fontsize
     \setlength{\tabcolsep}{4pt}% column separation
     \renewcommand{\arraystretch}{1.2}%row space
+    \caption{单GPU域分解模式解泊松方程耗时}
     \begin{tabular}{lc}
         \hline\hline
         从CPU拷贝到GPU    & 1.306     \\
@@ -47,7 +48,6 @@ Cori Knight Landing（KNL）是Cori的新计算平台，位于美国国家能源
         总计                              & 8.544    \\
         \hline\hline
     \end{tabular}
-    \caption{单GPU域分解模式解泊松方程耗时}
     \label{tab:1GPU_Poisson}
 \end{table}
 
@@ -82,6 +82,7 @@ Cori Knight Landing（KNL）是Cori的新计算平台，位于美国国家能源
     \footnotesize% fontsize
     \setlength{\tabcolsep}{4pt}% column separation
     \renewcommand{\arraystretch}{1.2}%row space
+    \caption{单节点双GPU域分解模式解泊松方程耗时}
     \begin{tabular}{lcc}
         \hline\hline
                           & 1GPU    & 2GPU   \\
@@ -97,7 +98,6 @@ Cori Knight Landing（KNL）是Cori的新计算平台，位于美国国家能源
         总计              & 8.544   & 9.537  \\
         \hline\hline
     \end{tabular}
-    \caption{单节点双GPU域分解模式解泊松方程}
     \label{tab:2GPU_Poisson}
 \end{table}
 
@@ -119,6 +119,7 @@ Cori Knight Landing（KNL）是Cori的新计算平台，位于美国国家能源
 
 \begin{table}
   \centering
+  \caption{$64 \times 64 \times 64$格点下，跨节点多GPU 域分解模式解泊松方程各部分所用时间}
   \begin{tabular}{|l|c|c|c|c|c|c|c|}
     \hline
     GPU数目	    &1	    &2	    &4	    &8 	    &16	    &32  	&64   \\
@@ -130,7 +131,6 @@ Cori Knight Landing（KNL）是Cori的新计算平台，位于美国国家能源
     总计	        &8.015	&7.273	&3.188	&1.51	&0.842	&0.653	&0.6783 \\
     \hline
   \end{tabular}
-  \caption{$64 \times 64 \times 64$格点下，跨节点多GPU 域分解模式解泊松方程各部分所用时间}
   \label{tab:TITAN_GPU_Poisson64}
 \end{table}
 
@@ -148,6 +148,7 @@ Cori Knight Landing（KNL）是Cori的新计算平台，位于美国国家能源
 
 \begin{table}
   \centering
+  \caption{$128 \times 128 \times 128$格点下，跨节点多GPU域分解模式解泊松方程各部分所用时间}
   \begin{tabular}{|>{\small}l|c|c|c|c|c|c|c|c|c|}
     \hline
     GPU数目	    &1	    &2	    &4	    &8 	    &16	    &32  	&64     &128	&256   \\
@@ -159,7 +160,6 @@ Cori Knight Landing（KNL）是Cori的新计算平台，位于美国国家能源
     总计	        &93.58	&95.21	&58.94	&27.05	&11.68	&4.884	&2.56	&2.014	&2.592\\
     \hline
   \end{tabular}
-  \caption{$128 \times 128 \times 128$格点下，跨节点多GPU域分解模式解泊松方程各部分所用时间}
   \label{tab:TITAN_GPU_Poisson128}
 \end{table}
 
@@ -197,6 +197,7 @@ Cori Knight Landing（KNL）是Cori的新计算平台，位于美国国家能源
 
 \begin{table}
   \centering
+  \caption{PIC程序在单GPU上的加速比}
   \begin{tabular}{|l|r|r|r|}
     \hline
     16k                      &    CPU(s)      &     GPU(s)    &  Speedup    \\
@@ -231,7 +232,7 @@ Cori Knight Landing（KNL）是Cori的新计算平台，位于美国国家能源
     output                   &    0.62289     &     0.06931   &  8.987015   \\
     total loop               &    53.51193    &     1.46745   &  36.46593   \\
     \hline
-    1.6m                     &    CPU(s)      &     GPU(s)    &  Speedup    \\
+    1.6M                     &    CPU(s)      &     GPU(s)    &  Speedup    \\
     \hline
     depositor (include sort) &    6.7528      &     1.73779   &  3.885855   \\
     Poisson solver           &    26.03071    &     0.39894   &  65.24969   \\
@@ -240,7 +241,6 @@ Cori Knight Landing（KNL）是Cori的新计算平台，位于美国国家能源
     total loop               &    90.40391    &     2.99053   &  30.23006   \\
     \hline
   \end{tabular}
-  \caption{PIC程序在单GPU上的加速比}
   \label{tab:PIC_speedup_1GPU}
 \end{table}
 
@@ -307,7 +307,7 @@ Titan中每个节点只有一个GPU，因此只能通过使用多个节点来使
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.9\textwidth]{Img/PIC_speedup_Titan_160k_2.pdf}
-  \caption{$64 \times 64 \times 64$个格点，160Kk个粒子时，Titan上域分解模式PIC程序耗时随GPU个数的变化}
+  \caption{$64 \times 64 \times 64$个格点，160K个粒子时，Titan上域分解模式PIC程序耗时随GPU个数的变化}
   \label{fig:PIC_speedup_Titan_160k_2}
 \end{figure}
 
@@ -508,7 +508,7 @@ GPU数目等于1和等于2的时候没有数据。对于更多的GPU数目，程
         \caption{程序整体加速比}
         \label{fig:TotalOpt}
     \end{subfigure}
-    \caption{单GPU加速比}\label{fig:OneGPU}
+    \caption{Symplectic算法的单GPU加速比随着分解阶数和粒子数目的变化}\label{fig:OneGPU}
 \end{figure}
 
 图\ref{fig:SCOpt}为优化后的空间电荷效应求解器的加速比在不同的问题规模下的变化。
@@ -559,7 +559,7 @@ GPU数目等于1和等于2的时候没有数据。对于更多的GPU数目，程
         \caption{程序整体加速比}
         \label{fig:TotalTitan}
     \end{subfigure}
-    \caption{多GPU加速比}\label{fig:Titan}
+    \caption{Symplectic算法的多GPU加速比随着分解阶数和粒子数目的变化}\label{fig:Titan}
 \end{figure}
 
 由图\ref{fig:SCTitan}可得，在一开始，空间电荷效应求解器的加速比随着GPU的数目几乎线性增加，直到逐渐到达一个极限。
@@ -581,4 +581,4 @@ GPU数目等于1和等于2的时候没有数据。对于更多的GPU数目，程
 
 对于Symplectic算法，在一个普通家用GPU上相对于单核CPU实现了超过450倍的加速比。
 同时，我们在GPU集群Titan上的测试还显示出这种算法有良好的可扩展性，程序的加速比随着GPU数目几乎线性增加。
-在未来的研究中，我们将继续扩展此模型速发，并在不同架构的计算机上比较Symplectic算法的效率。
+在未来的研究中，我们将继续对这个算法进行扩展，并在不同架构的计算机上比较Symplectic算法的效率。
