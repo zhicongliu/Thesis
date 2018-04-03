@@ -7,8 +7,8 @@
   \confidential{}% show confidential tag
   \schoollogo{scale=0.112}{UCAS}% university logo
   \title[强流束流动力学研究及其模拟软件开发]{强流束流动力学研究及其模拟软件开发}% \title[short title for headers]{Long title of thesis}
-%  \author{刘志聪}% name of author
-%  \advisor{秦庆~研究员}% names and titles of supervisors
+  \author{ }% name of author
+  \advisor{ }% names and titles of supervisors
   \advisorinstitute{中国科学院高能物理研究所}% institute names of supervisors
   \degree{博士}% degree
   \degreetype{理学}% degree type
@@ -20,8 +20,8 @@
 
 %  \englishtitle{Study of High Current Beam Dynamics \\and the Development of its Simulation Code}
   \englishtitle{Study on High Current Beam Dynamics\\and the Simulation Code Development}
-%  \englishauthor{Zhicong Liu}
-%  \englishadvisor{Professor Qing Qin}
+  \englishauthor{ }
+  \englishadvisor{ }
   \englishdegree{Doctor}
   \englishthesistype{thesis}
   \englishmajor{Nuclear and Particle Physics}
@@ -61,13 +61,14 @@
 基于此，作者在~TOPO~的基础上进行了程序并行化处理和功能扩充，使用~C++~语言开发了基于~PIC~算法的束流模拟程序~P-TOPO。
 我们对于程序的核心算法，PIC~算法，在~GPU~上和~CPU~集群上都进行了并行化实现，以提高模拟软件的效率。
 除了~PIC~算法之外，我们还引入了一种新型算法，无网格~Symplectic~算法，用来求解空间电荷效应。
+%与传统的PIC算法相比，它可以有效地降低网格热噪声带来的发射度增长，但其代价是计算效率较低。
 这种算法以更大的计算量为代价，显著降低了经典PIC算法中网格热噪声带来的发射度增长。
 无网格~Symplectic~算法很适合并行，有很好的可扩展性。
 我们也对~Symplectic~算法在GPU上进行了并行化实现，使其运行速度得到显著提升。
 
 %simulation
 在程序开发和性能测试之后，我们使用~P-TOPO~进行了~C-ADS~注入器I的模拟和一些空间电荷相关的物理问题研究。
-首先，我们使用~P-TOPO~对~C-ADS~注入器I进行了完整的模拟，并对比了~P-TOPO~模拟结果和其他模拟程序的结果。
+首先，我们使用~P-TOPO~对~C-AD~S注入器I进行了完整的模拟，并对比了~P-TOPO~模拟结果和其他模拟程序的结果。
 这个模拟一方面验证了~C-ADS~注入器I设计的合理性，另一方面也验证了~P-TOPO~的正确性。
 我们还使用~Symplectic~算法对周期聚焦结构中由空间电荷效应导致的三阶共振现象进行了模拟和研究。
 此外，我们还使用~P-TOPO~研究了加速器中的束流如何自发地受到相干结构共振的影响，
@@ -76,7 +77,7 @@
 而在向上和向下穿越过程中出现的“吸引”和“排斥”现象是束流对于共振的自发反应。
 研究还表明束流发射度增长与其在共振禁带内停留的时间正相关。
 
-\keywords{空间电荷效应，并行模拟软件，PIC，Symplectic，共振穿越}
+\keywords{加速器，空间电荷效应，模拟软件，PIC，Symplectic，GPU，共振穿越}
 %\end{abstract}
 
 
@@ -89,7 +90,9 @@ A direct result from resonance is beam halo and beam loss.
 In general, there are two approaches to the model the space charge effect.
 One approach starts from a non-self-consistent model which gives a rough physical picture.
 Another is from the numerical simulation which is more time-consuming but much more precise.
-Since the space charge effect is a multi-body coupling problem, we cannot get the analytical solution.
+%In order to explore the physical mechanism on the halo formation,
+%a non-self-consistent model is applied to analyze the propagation of beam to obtained a rough physical image.
+Since the space charge effect is a multi-body coupling problem, we can not get the analytical solution.
 In order to have a more sophisticated understanding of the mechanism behind the problem,
 a software which can carry on the accurate numerical simulation is necessary.
 
@@ -102,22 +105,24 @@ simulation code P-TOPO based on PIC method using C++ language.
 The code was implemented with paralleled PIC algorithm on
 both the GPU and the CPU cluster to improve the efficiency.
 Besides the PIC method, we also introduced a new space
-charge solver based on gridless Symplectic algorithm.
+charge solver based on gridless symplectic algorithm.
 It can effectively reduce the emittance growth associated with numerical
 grid heating compared with traditional PIC algorithm at the expense of lower computation efficiency.
-The Symplectic algorithm is very suitable for parallelism and can achieve very good speedup and scalability.
+The symplectic algorithm is very suitable for parallelism and can achieve very good speeded and scalability.
 We implemented it on GPU using CUDA library and achieved a significant speedup.
 
 After the code development and performance test, we performed the simulation of C-ADS Injector I with P-TOPO
 and studied several space charge related beam dynamics problems.
-Firstly, a start-to-end simulation of C-ADS injector I was performed,
+Firstly, an start-to-end simulation of C-ADS injector I was performed,
 and the results from P-TOPO and those from other simulation codes were compared.
 On one hand the correctness of P-TOPO is verified,
-and on the other hand it is considered as the verification of code by an existing tuning machine.
-Secondly, we simulated and studied of the single particle third-order resonance due to space charge effect
-in the periodic focusing structure using the Symplectic algorithm.
-Thirdly, we studied how the beam is spontaneously affected by the coherent structure resonances using P-TOPO 
+and on the other hand it is considered as the verification of code by a existing tuning machine.
+%and on the other hand verified that the C-ADS injector I design is reasonable.
+Secondly, we simulated and studied of the  single particle third-order resonance due to space charge effect
+in the periodic focusing structure using the symplectic algorithm.
+Thirdly, we studied how the beam is spontaneously affected by the coherent structure resonances using P-TOPO,
 and explored the problem of the resonance stop band crossing.
+%in which several characteristics are discussed to distinguish incoherent and coherent effect.
 It shows that the beam phase advance will oscillate when crossing the resonance stop band.
 Related ``attraction'' and ``repulsion'' effects in the case of upward
 and downward crossing is a natural beam coherent reaction to the resonance.
@@ -126,5 +131,5 @@ It also shows that the beam emittance growth is positively correlated with the t
 %Symplectic code
 
 
-\englishkeywords{Space charge effect, Parallel simulation code, PIC, Symplectic, Resonance crossing}
+\englishkeywords{Accelerator, Space charge, Simulation code, PIC, Symplectic, GPU, Resonance crossing}
 %\end{englishabstract}

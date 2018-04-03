@@ -964,7 +964,7 @@ FUNCTION {article}
       new.block
       format.edition output
       new.block
-      format.address output
+      %format.address output
       format.publisher punct.colon output.after
       format.date "year" output.check
       format.pages punct.colon output.after
@@ -1003,8 +1003,9 @@ FUNCTION {book}
   format.translators output
   new.block
   format.edition output
-  new.sentence
-  format.address output
+  new.block
+  %new.sentence
+  %format.address output
   format.publisher punct.colon output.after
   format.date "year" output.check
   format.pages punct.colon output.after
@@ -1107,8 +1108,9 @@ FUNCTION {inproceedings}
   format.bvolume punct.colon output.after
   new.block
   format.edition output
-  new.sentence
-  format.address output
+  new.block
+  %new.sentence
+  %format.address output
   publisher empty$
     { organization }
     { format.publisher }
@@ -1131,7 +1133,7 @@ FUNCTION {manual}
   format.series.volume.title "title" output.check
   organization address new.block.checkb
   organization output
-  format.address output
+  %format.address output
   format.edition output
   format.date output
   format.url output

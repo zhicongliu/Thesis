@@ -5,22 +5,22 @@
 %% The original source files were:
 %%
 %% gbt-7714-2015.dtx  (with options: `authoryear')
-%% 
+%%
 %% Copyright (C) 2016-2016 by Zeping Lee <zepinglee AT gmail.com>
-%% 
+%%
 %% This file may be distributed and/or modified under the
 %% conditions of the LaTeX Project Public License, either
 %% version 1.2 of this license or (at your option) any later
 %% version. The latest version of this license is in:
-%% 
+%%
 %%     http://www.latex-project.org/lppl.txt
-%% 
+%%
 %% and version 1.2 or later is part of all distributions of
 %% LaTeX version 1999/12/01 or later.
-%% 
+%%
 %% This BibTeX style file is derived from `plainnat.bst' by Patrick W Daly,
 %% which was designed for use with the `natbib.sty' package.
-%% 
+%%
 ENTRY
   { address
     author
@@ -1005,7 +1005,7 @@ FUNCTION {book}
   new.block
   format.edition output
   new.sentence
-  format.address output
+  format.address output.check
   format.publisher punct.colon output.after
   format.date "year" output.check
   format.pages punct.colon output.after
@@ -1131,9 +1131,9 @@ FUNCTION {manual}
   new.block
   format.series.volume.title "title" output.check
   organization address new.block.checkb
-  organization output
-  format.address output
-  format.edition output
+  organization output.check
+  format.address output.check
+  format.edition output.check
   format.date output
   format.url output
   new.block
@@ -1198,9 +1198,9 @@ FUNCTION {misc}
   new.block
   format.translators output
   new.block
-  format.edition output
+  format.edition output.after
   new.sentence
-  format.address output
+  format.address output.after
   format.publisher punct.colon output.after
   format.date "year" output.check
   format.pages punct.colon output.after
